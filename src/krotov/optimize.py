@@ -3,7 +3,7 @@ import inspect
 import logging
 import time
 from functools import partial
-
+from .Integrals import overlap2, gaussiano_norm
 import numpy as np
 import threadpoolctl
 from qutip import Qobj
@@ -241,8 +241,13 @@ def optimize_pulses(
     second_order = sigma is not None
     if norm is None:
         norm = lambda state: state.norm()
+    if norm=='gaussiano':
+        norm=gaussiano_norm
     if overlap is None:
         overlap = _overlap
+    if overlap =='gaussiano':
+        overlap=overlap2
+
     if modify_params_after_iter is not None:
         # From a technical perspective, the `modify_params_after_iter` is
         # really just another info_hook, the only difference is the
@@ -391,7 +396,7 @@ def optimize_pulses(
 
     # Main optimization loop
     for krotov_iteration in range(iter_start + 1, iter_stop + 1):
-
+        # pulse update
         logger.info("Started Krotov iteration %d", krotov_iteration)
         tic = time.time()
 
@@ -450,7 +455,7 @@ def optimize_pulses(
             dt = tlist[time_index + 1] - tlist[time_index]
             if second_order:
                 σ = sigma(tlist[time_index] + 0.5 * dt)
-            # pulse update
+        
             for (i_pulse, guess_pulse) in enumerate(guess_pulses):
                 for (i_obj, objective) in enumerate(objectives):
                     χ = backward_states[i_obj][time_index]

@@ -107,7 +107,7 @@ class Objective:
         >>> H0 = - 0.5 * qutip.operators.sigmaz()
         >>> H1 = qutip.operators.sigmax()
         >>> eps = lambda t, args: ampl0
-        >>> H = [H0, [H1, eps]]
+        >>> H = [H0, [H1, eps],H2]
         >>> krotov.Objective(
         ...     initial_state=qutip.ket('0'), target=qutip.ket('1'), H=H
         ... )

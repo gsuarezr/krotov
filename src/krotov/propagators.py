@@ -71,7 +71,7 @@ import threadpoolctl
 from qutip.cy.spconvert import dense2D_to_fastcsr_fmode
 from qutip.cy.spmatfuncs import spmvpy_csr
 from qutip.superoperator import mat2vec, vec2mat
-
+import scipy.integrate as integrate
 
 __all__ = ['expm', 'Propagator', 'DensityMatrixODEPropagator']
 
@@ -104,8 +104,14 @@ def expm(H, state, dt, c_ops=None, backwards=False, initialize=False):
         if backwards:
             eqm_factor = eqm_factor.conjugate()
         A = eqm_factor * H[0]
-    for part in H[1:]:
+    for part in H[1]:
         if isinstance(part, list):
+            A += (eqm_factor * part[1]) * part[0]
+        else:
+            A += eqm_factor * part
+    for part in H[2]:
+        if isinstance(part,list):
+            part[1]=integrate.quad(lambda x: part[1],0,dt) #  No se si a este t
             A += (eqm_factor * part[1]) * part[0]
         else:
             A += eqm_factor * part

@@ -130,8 +130,75 @@ def derivative_wrt_pulse(
         if mu.type == 'super':
             eqm_factor = 1
             mu *= 1j
-        for i in ham_mapping[1:]:
+        for i in ham_mapping[1:2]:
             mu += (1j * eqm_factor) * objective.H[i][0]
+    for i_c_op in range(len(objective.c_ops)):
+        if len(pulses_mapping[i_objective][i_c_op + 1][i_pulse]) != 0:
+            raise NotImplementedError(
+                "Time-dependent collapse operators not implemented"
+            )
+    return mu
+
+def  integral_update(
+    objectives, i_objective, pulses, pulses_mapping, i_pulse, time_index
+):
+    r"""Calculate ∂H/∂ϵ for the standard equations of motion.
+
+    Args:
+        objectives (list): List of :class:`.Objective` instances
+        i_objective (int): The index of the objective in `objectives` whose
+            equation of motion the derivative should be calculated.
+        pulses (list): The list of pulses occuring in `objectives`
+        pulses_mapping (list): The mapping of elements of `pulses` to the
+            components of `objectives`, as returned by
+            :func:`.extract_controls_mapping`
+        i_pulse (int): The index of the pulse in `pulses` for which to
+            calculate the derivative
+        time_index (int): The index of the value in ``pulses[i_pulse]`` that
+            should be plugged in to ∂H/∂ϵ. Not used, as this routine only
+            considers equations of motion that are linear in the controls.
+
+    Returns:
+        callable: The quantum operator or super-operator that
+        represents ∂H/∂ϵ. In general, the return type can be any callable `mu`
+        so that ``mu(state)`` calculates the result of applying ∂H/∂ϵ to
+        `state`. In most cases, a :class:`~qutip.Qobj` will be returned, which
+        is just the most convenient example of an appropriate callable.
+
+    This function covers the following cases:
+
+    * the :attr:`~.Objective.H` attribute of the objective contains a
+      Hamiltonian, there are no :attr:`~.Objective.c_ops` (Schrödinger
+      equation: the abstract H in ∂H/∂ϵ is the Hamiltonian directly)
+
+    * the :attr:`~.Objective.H` attribute of the objective contains a
+      Hamiltonian $\Op{H}$, and there are Lindblad operators $\Op{L}_i$ in
+      :attr:`~.Objective.c_ops` (master equation in Lindblad form). The
+      abstract H is $i \Liouville$ for the Liouvillian defined as
+
+      .. math::
+
+        \Liouville[\Op{\rho}] =
+        -i[\Op{H},\Op{\rho}]+\sum_{i} \left(
+            \Op{L}_i \Op{\rho} \Op{L}_i^\dagger -
+            \frac{1}{2} \left\{
+                \Op{L}_i^\dagger \Op{L}_i, \Op{\rho}\right\} \right)
+
+    * the :attr:`~.Objective.H` attribute of the objective contains a
+      super-operator $\Liouville$, there are no :attr:`~.Objective.c_ops`
+      (general master equation). The abstract H is again $i \Liouville$.
+    """
+    objective = objectives[i_objective]
+    ham_mapping = pulses_mapping[i_objective][0][i_pulse]
+    eqm_factor = -1j  # the factor in front of objective.H in the eqm
+    if len(ham_mapping) == 0:
+        return lambda state: 0 * state
+    else:
+        mu = objective.H[ham_mapping[0]][0]
+        if mu.type == 'super':
+            eqm_factor = 1
+            mu *= 1j
+            mu += (1j * eqm_factor) * objective.H[-1][0]
     for i_c_op in range(len(objective.c_ops)):
         if len(pulses_mapping[i_objective][i_c_op + 1][i_pulse]) != 0:
             raise NotImplementedError(

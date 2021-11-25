@@ -49,11 +49,13 @@ from . import (
     result,
     second_order,
     shapes,
+    Integrals,
 )
 # expose primary classes/functions
 from .objectives import Objective, ensemble_objectives, gate_objectives
 from .optimize import optimize_pulses
 from .result import Result
+from .Integrals import overlap2
 
 
 __all__ = [
@@ -62,4 +64,5 @@ __all__ = [
     'ensemble_objectives',
     'gate_objectives',
     'optimize_pulses',
+    'overlap2'
 ]
