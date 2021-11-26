@@ -130,7 +130,7 @@ def derivative_wrt_pulse(
         if mu.type == 'super':
             eqm_factor = 1
             mu *= 1j
-        for i in ham_mapping[1:2]:
+        for i in ham_mapping[1:]:
             mu += (1j * eqm_factor) * objective.H[i][0]
     for i_c_op in range(len(objective.c_ops)):
         if len(pulses_mapping[i_objective][i_c_op + 1][i_pulse]) != 0:
