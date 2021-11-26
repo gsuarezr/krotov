@@ -1,6 +1,7 @@
 """Support functions for the second-order update equation"""
 from abc import ABC, abstractmethod
 from typing import Optional
+from .Integrals import overlap2
 
 
 __all__ = ['Sigma', 'numerical_estimate_A']
@@ -82,6 +83,12 @@ def _overlap(a, b) -> Optional[complex]:
     except AttributeError:
         return None
 
+def overlap_integral(dt,tlist,time_index,estado1,estado2,H):
+    suma=0
+    for i in tlist:
+        if tlist[time_index]>=i:
+            suma+=dt*overlap2(estado1,H(estado2)).imag
+    return suma 
 
 def numerical_estimate_A(
     forward_states, forward_states0, chi_states, chi_norms, Delta_J_T

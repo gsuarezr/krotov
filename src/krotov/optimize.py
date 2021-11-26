@@ -23,7 +23,7 @@ from .mu import derivative_wrt_pulse
 from .parallelization import USE_THREADPOOL_LIMITS
 from .propagators import Propagator, expm
 from .result import Result
-from .second_order import _overlap
+from .second_order import _overlap,overlap_integral
 from .shapes import one_shape, zero_shape
 
 
@@ -468,7 +468,8 @@ def optimize_pulses(
                         time_index,
                     )
                     Ψ = fw_states[i_obj]
-                    update = overlap(χ, μ(Ψ))  # ⟨χ|μ|Ψ⟩ ∈ ℂ
+                    update = overlap(χ, μ(Ψ))
+                    update +=overlap_integral(dt,tlist,time_index,χ,Ψ,objectives[i_obj].H[2][0])  # ⟨χ|μ|Ψ⟩ ∈ ℂ
                     update *= chi_norms[i_obj]
                     if second_order:
                         update += 0.5 * σ * overlap(delta_phis[i_obj], μ(Ψ))
