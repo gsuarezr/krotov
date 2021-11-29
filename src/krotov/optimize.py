@@ -839,7 +839,7 @@ def _forward_propagation(
         ]
         dt = tlist[time_index + 1] - tlist[time_index]
         state = propagators[i_objective](
-            H, state, dt, c_ops, initialize=(time_index == 0)
+            H, state, tlist[time_index],dt, c_ops, initialize=(time_index == 0)
         )
         if store_all:
             storage_array[time_index + 1] = state
@@ -882,6 +882,7 @@ def _backward_propagation(
         state = propagators[i_state](
             H,
             state,
+            tlist[time_index],
             dt,
             c_ops,
             backwards=True,
@@ -913,5 +914,5 @@ def _forward_propagation_step(
     ]
     dt = tlist[time_index + 1] - tlist[time_index]
     return propagators[i_state](
-        H, state, dt, c_ops, initialize=(time_index == 0)
+        H, state, tlist[time_index] ,dt, c_ops, initialize=(time_index == 0)
     )

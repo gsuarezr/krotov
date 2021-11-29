@@ -76,7 +76,7 @@ import scipy.integrate as integrate
 __all__ = ['expm', 'Propagator', 'DensityMatrixODEPropagator']
 
 
-def expm(H, state, dt, c_ops=None, backwards=False, initialize=False):
+def expm(H, state, t, dt, c_ops=None, backwards=False, initialize=False):
     """Propagate using matrix exponentiation.
 
     This supports `H` being a Hamiltonian (for a Hilbert space `state`) or a
@@ -111,7 +111,7 @@ def expm(H, state, dt, c_ops=None, backwards=False, initialize=False):
             A += eqm_factor * part
     for part in H[2]:
         if isinstance(part,list):
-            part[1]=integrate.quad(lambda x: part[1],0,dt) #  No se si a este t
+            part[1]=integrate.quad(lambda x: part[1],0,t) #  No se si a este t
             A += (eqm_factor * part[1]) * part[0]
         else:
             A += eqm_factor * part
@@ -133,7 +133,7 @@ class Propagator(ABC):
 
     @abstractmethod
     def __call__(
-        self, H, state, dt, c_ops=None, backwards=False, initialize=False
+        self, H, state, t, dt, c_ops=None, backwards=False, initialize=False
     ):
         """Evaluation of a single propagation step
 

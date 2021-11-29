@@ -3039,4 +3039,5 @@ def overlap2(vector1,vector2):
 
 
 def gaussiano_norm(z):
+    #return np.sqrt(overlap2(z,z))
     return 1
