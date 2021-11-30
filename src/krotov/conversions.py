@@ -10,7 +10,7 @@ piecewise-constant "pulses" defined on the *intervals* of the time grid.
 import copy
 import logging
 import warnings
-
+from scipy.integrate import simpson
 import numpy as np
 
 
@@ -285,7 +285,7 @@ def pulse_options_dict_to_list(pulse_options, controls):
     return pulse_options_list
 
 
-def plug_in_pulse_values(H, pulses, mapping, time_index, conjugate=False):
+def plug_in_pulse_values(H, pulses, mapping, time_index, conjugate=False,tlist=[0]*5000):
     """Plug pulse values into H.
 
     Args:
@@ -321,9 +321,15 @@ def plug_in_pulse_values(H, pulses, mapping, time_index, conjugate=False):
             ['X', ['X', 10], ['Y', 10], ['Z', 20]]
     """
     H = _nested_list_shallow_copy(H)
+    #tlist=tlist[:-1]  
+    #if time_index==0:
+    #    H[2][1]=0
+   # else:
+  #      H[2][1]=simpson(np.array(pulses[0])[:time_index], np.array(tlist)[:time_index])
     for (pulse, pulse_mapping) in zip(pulses, mapping):
         for i in pulse_mapping:
-            print(H[i])
+
+           # print(H[i])
             if conjugate:
                 H[i][1] = np.conjugate(pulse[time_index])
             else:

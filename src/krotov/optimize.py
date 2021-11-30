@@ -470,7 +470,7 @@ def optimize_pulses(
                     )
                     Ψ = fw_states[i_obj]
                     update = overlap(χ, μ(Ψ))  # ⟨χ|μ|Ψ⟩ ∈ ℂ
-                    #  update += overlap_integral(dt,tlist,time_index,χ,Ψ,objectives[i_obj].H[2][0])  # ⟨χ|μ|Ψ⟩ ∈ ℂ
+                    update += overlap_integral(dt,tlist,time_index,χ,Ψ,objectives[i_obj].H[2][0])  # ⟨χ|μ|Ψ⟩ ∈ ℂ
                     update *= chi_norms[i_obj]
                     if second_order:
                         update += 0.5 * σ * overlap(delta_phis[i_obj], μ(Ψ))
@@ -833,9 +833,9 @@ def _forward_propagation(
         storage_array[0] = state
     mapping = pulses_mapping[i_objective]
     for time_index in range(len(tlist) - 1):  # index over intervals
-        H = plug_in_pulse_values(obj.H, pulses, mapping[0], time_index)
+        H = plug_in_pulse_values(obj.H, pulses, mapping[0], time_index,tlist=tlist)
         c_ops = [
-            plug_in_pulse_values(c_op, pulses, mapping[ic + 1], time_index)
+            plug_in_pulse_values(c_op, pulses, mapping[ic + 1], time_index,tlist=tlist)
             for (ic, c_op) in enumerate(obj.c_ops)
         ]
         dt = tlist[time_index + 1] - tlist[time_index]
@@ -873,10 +873,10 @@ def _backward_propagation(
     mapping = pulses_mapping[i_state]
     for time_index in range(len(tlist) - 2, -1, -1):  # index bw over intervals
         H = plug_in_pulse_values(
-            obj.H, pulses, mapping[0], time_index, conjugate=True
+            obj.H, pulses, mapping[0], time_index, conjugate=True,tlist=tlist
         )
         c_ops = [
-            plug_in_pulse_values(c_op, pulses, mapping[ic + 1], time_index)
+            plug_in_pulse_values(c_op, pulses, mapping[ic + 1], time_index,tlist=tlist)
             for (ic, c_op) in enumerate(obj.c_ops)
         ]
         dt = tlist[time_index + 1] - tlist[time_index]
@@ -908,9 +908,9 @@ def _forward_propagation_step(
     state = states[i_state]
     obj = objectives[i_state]
     mapping = pulses_mapping[i_state]
-    H = plug_in_pulse_values(obj.H, pulses, mapping[0], time_index)
+    H = plug_in_pulse_values(obj.H, pulses, mapping[0], time_index,tlist=tlist)
     c_ops = [
-        plug_in_pulse_values(c_op, pulses, mapping[ic + 1], time_index)
+        plug_in_pulse_values(c_op, pulses, mapping[ic + 1], time_index,tlist=tlist)
         for (ic, c_op) in enumerate(obj.c_ops)
     ]
     dt = tlist[time_index + 1] - tlist[time_index]

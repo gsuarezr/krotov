@@ -411,9 +411,9 @@ class Objective:
             for control in controls
         ]
         for time_index in range(len(tlist) - 1):  # index over intervals
-            H_at_t = plug_in_pulse_values(H, pulses, mapping[0], time_index)
+            H_at_t = plug_in_pulse_values(H, pulses, mapping[0], time_index,tlist=tlist)
             c_ops_at_t = [
-                plug_in_pulse_values(c_op, pulses, mapping[ic + 1], time_index)
+                plug_in_pulse_values(c_op, pulses, mapping[ic + 1], time_index,tlist=tlist)
                 for (ic, c_op) in enumerate(c_ops)
             ]
             dt = tlist[time_index + 1] - tlist[time_index]
