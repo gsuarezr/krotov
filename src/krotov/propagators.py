@@ -104,14 +104,14 @@ def expm(H, state, t, dt, c_ops=None, backwards=False, initialize=False):
         if backwards:
             eqm_factor = eqm_factor.conjugate()
         A = eqm_factor * H[0]
-    for part in H[1]:
+    for part in H[1:2]:
         if isinstance(part, list):
             A += (eqm_factor * part[1]) * part[0]
         else:
             A += eqm_factor * part
-    for part in H[2]:
+    for part in H[2:]:
         if isinstance(part,list):
-            part[1]=integrate.quad(lambda x: part[1],0,t) #  No se si a este t
+     #       part[1]=integrate.quad(lambda x: part[1],0,t) #  No se si a este t
             A += (eqm_factor * part[1]) * part[0]
         else:
             A += eqm_factor * part

@@ -8,6 +8,8 @@ import numpy as np
 import threadpoolctl
 from qutip import Qobj
 from qutip.parallel import serial_map
+from scipy.integrate import quad
+
 
 from .conversions import (
     control_onto_interval,
@@ -245,8 +247,7 @@ def optimize_pulses(
         norm=gaussiano_norm
     if overlap is None:
         overlap = _overlap
-    if overlap =='gaussiano':
-        overlap=overlap2
+
 
     if modify_params_after_iter is not None:
         # From a technical perspective, the `modify_params_after_iter` is
@@ -468,8 +469,8 @@ def optimize_pulses(
                         time_index,
                     )
                     Ψ = fw_states[i_obj]
-                    update = overlap(χ, μ(Ψ))
-                    update +=overlap_integral(dt,tlist,time_index,χ,Ψ,objectives[i_obj].H[2][0])  # ⟨χ|μ|Ψ⟩ ∈ ℂ
+                    update = overlap(χ, μ(Ψ))  # ⟨χ|μ|Ψ⟩ ∈ ℂ
+                    #  update += overlap_integral(dt,tlist,time_index,χ,Ψ,objectives[i_obj].H[2][0])  # ⟨χ|μ|Ψ⟩ ∈ ℂ
                     update *= chi_norms[i_obj]
                     if second_order:
                         update += 0.5 * σ * overlap(delta_phis[i_obj], μ(Ψ))
@@ -839,7 +840,7 @@ def _forward_propagation(
         ]
         dt = tlist[time_index + 1] - tlist[time_index]
         state = propagators[i_objective](
-            H, state, tlist[time_index],dt, c_ops, initialize=(time_index == 0)
+            H, state,tlist[time_index], dt, c_ops, initialize=(time_index == 0)
         )
         if store_all:
             storage_array[time_index + 1] = state
@@ -914,5 +915,5 @@ def _forward_propagation_step(
     ]
     dt = tlist[time_index + 1] - tlist[time_index]
     return propagators[i_state](
-        H, state, tlist[time_index] ,dt, c_ops, initialize=(time_index == 0)
+        H, state, tlist[time_index],dt, c_ops, initialize=(time_index == 0)
     )

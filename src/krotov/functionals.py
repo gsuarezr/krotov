@@ -57,8 +57,9 @@ import logging
 import numpy as np
 import qutip
 
-from .second_order import _overlap
+#from .second_order import _overlap
 from .Integrals import overlap2
+_overlap=overlap2
 
 __all__ = [
     'f_tau',
@@ -120,7 +121,7 @@ def f_tau(fw_states_T, objectives, tau_vals=None, **kwargs):
     """
     if tau_vals is None:
         tau_vals = [
-            overlap2(obj.target, psi)
+            _overlap(obj.target, psi)
             for (psi, obj) in zip(fw_states_T, objectives)
         ]
     res = 0j
@@ -152,7 +153,7 @@ def F_ss(fw_states_T, objectives, tau_vals=None, **kwargs):
     if tau_vals is None:
         # get the absolute square, analogously to the f_tau function above
         tau_vals_abssq = [
-            abs(overlap2(obj.target, psi)) ** 2
+            abs(_overlap(obj.target, psi)) ** 2
             for (psi, obj) in zip(fw_states_T, objectives)
         ]
     else:

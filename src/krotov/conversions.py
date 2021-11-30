@@ -323,6 +323,7 @@ def plug_in_pulse_values(H, pulses, mapping, time_index, conjugate=False):
     H = _nested_list_shallow_copy(H)
     for (pulse, pulse_mapping) in zip(pulses, mapping):
         for i in pulse_mapping:
+            print(H[i])
             if conjugate:
                 H[i][1] = np.conjugate(pulse[time_index])
             else:
