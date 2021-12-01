@@ -271,5 +271,6 @@ def _plug_in_optimized_controls(H, controls, mapping):
     H = _nested_list_shallow_copy(H)
     for (control, control_mapping) in zip(controls, mapping):
         for i in control_mapping:
-            H[i][1] = control
+            if i==1:
+                H[i][1] = control
     return H

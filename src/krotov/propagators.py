@@ -113,6 +113,7 @@ def expm(H, state, t, dt, c_ops=None, backwards=False, initialize=False):
         if isinstance(part,list):
      #       part[1]=integrate.quad(lambda x: part[1],0,t) #  No se si a este t
             A += (eqm_factor * part[1]) * part[0]
+            
         else:
             A += eqm_factor * part
     ok_types = (state.type == 'oper' and A.type == 'super') or (

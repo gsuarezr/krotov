@@ -324,16 +324,18 @@ def plug_in_pulse_values(H, pulses, mapping, time_index, conjugate=False,tlist=[
     tlist=tlist[:-1]  
     if time_index==0:
         H[2][1]=0
+        
     else:
         H[2][1]=simpson(np.array(pulses[0])[:time_index], np.array(tlist)[:time_index])
+        
     for (pulse, pulse_mapping) in zip(pulses, mapping):
         for i in pulse_mapping:
-
-           # print(H[i])
-            if conjugate:
-                H[i][1] = np.conjugate(pulse[time_index])
-            else:
-                H[i][1] = pulse[time_index]
+            if i==1:
+                if conjugate:
+                    H[i][1] = np.conjugate(pulse[time_index])
+                else:
+                    H[i][1] = pulse[time_index]
+                
     return H
 
 
