@@ -326,13 +326,13 @@ def optimize_pulses(
             for (state_T, obj) in zip(fw_states_T, objectives)
         ]
     )
-
-    if second_order:
-        forward_states0 = forward_states  # ∀t: Δϕ=0, for iteration 0
-    else:
+    forward_states0 = forward_states
+    #if second_order:
+        #forward_states0 = forward_states  # ∀t: Δϕ=0, for iteration 0
+    #else:
         # the forward-propagated states only need to be stored for the second
         # order update
-        forward_states0 = forward_states = None
+        #forward_states0 = forward_states = None
 
     info = None
     optimized_pulses = copy.deepcopy(guess_pulses)
@@ -447,6 +447,11 @@ def optimize_pulses(
         if second_order:
             for i_obj in range(len(objectives)):
                 forward_states[i_obj][0] = objectives[i_obj].initial_state
+        forward_states = [
+                storage(len(tlist)) for _ in range(len(objectives))
+            ]
+        for i_obj in range(len(objectives)):
+                forward_states[i_obj][0] = objectives[i_obj].initial_state
         delta_eps = [
             np.zeros(len(tlist) - 1, dtype=np.complex128) for _ in guess_pulses
         ]
@@ -469,16 +474,20 @@ def optimize_pulses(
                         time_index,
                     )
                     Ψ = fw_states[i_obj]
-                    update = overlap(χ, μ(Ψ))  # ⟨χ|μ|Ψ⟩ ∈ ℂ
-                    update += overlap_integral(dt,tlist,time_index,χ,Ψ,objectives[i_obj].H[2][0])  # ⟨χ|μ|Ψ⟩ ∈ ℂ
+                    update = overlap(χ, μ(Ψ)).imag
+                    
+ 
+                    update += overlap_integral(dt,tlist,time_index,backward_states[i_obj],forward_states[i_obj],objectives[i_obj].H[2][0],objectives[i_obj].initial_state)
+                    
+                    # 
                     update *= chi_norms[i_obj]
                     if second_order:
                         update += 0.5 * σ * overlap(delta_phis[i_obj], μ(Ψ))
                     delta_eps[i_pulse][time_index] += update
                 λₐ = lambda_vals[i_pulse]
                 S_t = shape_arrays[i_pulse][time_index]
-                Δϵ_1 = delta_eps[i_pulse][time_index].imag  # for "step size" 1
-                Δϵ = (S_t / λₐ) * Δϵ_1  # ∈ ℝ
+                Δϵ_1 = delta_eps[i_pulse][time_index]# for "step size" 1
+                Δϵ = (S_t / λₐ) * np.real(Δϵ_1)  # ∈ ℝ
                 g_a_integrals[i_pulse] += (S_t / λₐ) * abs(Δϵ_1) ** 2 * dt
                 # dt may vary! -- hence we've included it in each summand
                 optimized_pulses[i_pulse][time_index] += Δϵ
@@ -496,6 +505,8 @@ def optimize_pulses(
                     propagators,
                 ),
             )
+            for i_obj in range(len(objectives)):
+                    forward_states[i_obj][time_index + 1] = fw_states[i_obj]
             if second_order:
                 # Δϕ(t + dt), to be used for the update in the next interval
                 delta_phis = [

@@ -83,12 +83,16 @@ def _overlap(a, b) -> Optional[complex]:
     except AttributeError:
         return None
 
-def overlap_integral(dt,tlist,time_index,estado1,estado2,H):
+def overlap_integral(dt,tlist,time_index,estado1,estado2,H,psi0):
     suma=0
-    for i in tlist:
-        if tlist[time_index]>=i:
-            suma+=0.5*dt*overlap2(estado1,H(estado2)).imag
-    return suma 
+    for i in range(len(tlist)-1):
+        if time_index>=i:
+            if i==0:
+                suma+=0.5*dt*overlap2(estado1[i],H(psi0))
+                
+            else:
+                suma+=0.5*dt*overlap2(estado1[i],H(estado2[i]))
+    return suma.imag
 
 def numerical_estimate_A(
     forward_states, forward_states0, chi_states, chi_norms, Delta_J_T
