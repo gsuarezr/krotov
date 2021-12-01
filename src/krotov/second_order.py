@@ -87,7 +87,7 @@ def overlap_integral(dt,tlist,time_index,estado1,estado2,H):
     suma=0
     for i in range(len(tlist)-1):
         if time_index>=i:               
-            suma+=0.5*dt*overlap2(estado1[i],H(estado2[i]))
+            suma+=(0.5*dt*overlap2(estado1[i],H(estado2[i]))).imag
     return suma
 
 def numerical_estimate_A(
