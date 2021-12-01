@@ -475,10 +475,8 @@ def optimize_pulses(
                     )
                     Ψ = fw_states[i_obj]
                     update = overlap(χ, μ(Ψ)).imag
-                    
- 
-                    update += overlap_integral(dt,tlist,time_index,backward_states[i_obj],forward_states[i_obj],objectives[i_obj].H[2][0],objectives[i_obj].initial_state)
-                    
+
+                    update += overlap_integral(dt,tlist,time_index,backward_states[i_obj],forward_states[i_obj],objectives[i_obj].H[2][0]).imag
                     # 
                     update *= chi_norms[i_obj]
                     if second_order:
