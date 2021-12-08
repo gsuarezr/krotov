@@ -150,12 +150,15 @@ def F_ss(fw_states_T, objectives, tau_vals=None, **kwargs):
     The `kwargs` are ignored, allowing the function to be used in an
     `info_hook`.
     """
-    if tau_vals is None:
-        # get the absolute square, analogously to the f_tau function above
+    if tau_vals is  None:
         tau_vals_abssq = [
-            abs(_overlap(obj.target, psi)) ** 2
+            abs(overlap2(obj.target, psi)) ** 2
             for (psi, obj) in zip(fw_states_T, objectives)
         ]
+       
+
+        # get the absolute square, analogously to the f_tau function above
+        
     else:
         tau_vals_abssq = [abs(tau) ** 2 for tau in tau_vals]
     F = f_tau(fw_states_T, objectives, tau_vals_abssq)

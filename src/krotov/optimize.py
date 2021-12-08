@@ -394,7 +394,9 @@ def optimize_pulses(
             iter_start + 1,
         )
     result.states = fw_states_T
-
+    dummy = [
+                [0]*len(tlist) for _ in range(len(objectives))
+            ]
     # Main optimization loop
     for krotov_iteration in range(iter_start + 1, iter_stop + 1):
         # pulse update
@@ -432,7 +434,7 @@ def optimize_pulses(
 
         # Forward propagation and pulse update
         logger.info("Started forward propagation/pulse update")
-        if second_order:
+        if True:
             forward_states = [
                 storage(len(tlist)) for _ in range(len(objectives))
             ]
@@ -444,20 +446,17 @@ def optimize_pulses(
                 Qobj(np.zeros(shape=chi_states[k].shape))
                 for k in range(len(objectives))
             ]
-        if second_order:
+        if True:
             for i_obj in range(len(objectives)):
                 forward_states[i_obj][0] = objectives[i_obj].initial_state
-        forward_states = [
-                storage(len(tlist)) for _ in range(len(objectives))
-            ]
-        for i_obj in range(len(objectives)):
-                forward_states[i_obj][0] = objectives[i_obj].initial_state
+                dummy[i_obj][0] = objectives[i_obj].initial_state
+
         delta_eps = [
             np.zeros(len(tlist) - 1, dtype=np.complex128) for _ in guess_pulses
         ]
         optimized_pulses = copy.deepcopy(guess_pulses)
         fw_states = [obj.initial_state for obj in objectives]
-        for time_index in range(len(tlist) - 1):  # iterate over time intervals
+        for time_index in range(len(tlist) - 1):# iterate over time intervals
             dt = tlist[time_index + 1] - tlist[time_index]
             if second_order:
                 σ = sigma(tlist[time_index] + 0.5 * dt)
@@ -475,8 +474,8 @@ def optimize_pulses(
                     )
                     Ψ = fw_states[i_obj]
                     update = overlap(χ, μ(Ψ)).imag
-
-                    update += overlap_integral(dt,tlist,time_index,backward_states[i_obj],forward_states[i_obj],objectives[i_obj].H[2][0])
+                    
+                    update += overlap_integral(dt,tlist,time_index,backward_states[i_obj],dummy[i_obj],objectives[i_obj].H[2][0])
                     # 
                     update *= chi_norms[i_obj]
                     if second_order:
@@ -503,18 +502,20 @@ def optimize_pulses(
                     propagators,
                 ),
             )
-            for i_obj in range(len(objectives)):
-                    forward_states[i_obj][time_index + 1] = fw_states[i_obj]
-            if second_order:
+
+            if True:
                 # Δϕ(t + dt), to be used for the update in the next interval
-                delta_phis = [
+                '''delta_phis = [
                     fw_states[k] - forward_states0[k][time_index + 1]
                     for k in range(len(objectives))
-                ]
+                ]'''
                 # storage
                 for i_obj in range(len(objectives)):
                     forward_states[i_obj][time_index + 1] = fw_states[i_obj]
+                    dummy[i_obj][time_index+1]=forward_states[i_obj][time_index + 1]
         logger.info("Finished forward propagation/pulse update")
+        
+
         fw_states_T = fw_states
         tau_vals = np.array(
             [
@@ -522,7 +523,6 @@ def optimize_pulses(
                 for (fw_state_T, obj) in zip(fw_states_T, objectives)
             ]
         )
-
         toc = time.time()
 
         # Display information about iteration

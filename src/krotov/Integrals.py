@@ -2980,17 +2980,17 @@ def condiciones(V,B,R,S):
                     return 1
                 else:
                     print(display(Markdown('Integral in $\\alpha_{4}$  is divergent, integrand does not fulfill $Re(C_{44})<0$')))
-                    print(R,V,S,B)
+                    #print(R,V,S,B)
                     raise NameError("Divergencia en la integral 1")
             else:
-               print(R,V,S,B)
+               #print(R,V,S,B)
                raise NameError(display(Markdown('Integral in $\\alpha_{4}$  is divergent, integrand does not fulfill $Re(C_{44})<0$')))
         else:
-            print(R,V,S,B)
+            #print(R,V,S,B)
             raise NameError(display(Markdown('Integral in $\\alpha_{4}$  is divergent, integrand does not fulfill $Re(C_{44})<0$')))
     else:
         print(display(Markdown('Integral in $\\alpha_{4}$  is divergent, integrand does not fulfill $Re(C_{44})<0$')))
-        print(R,V,S,B)
+        #print(R,V,S,B)
         raise NameError("Divergencia en la integral 1")
 
 def integral(V,B,R,S):
