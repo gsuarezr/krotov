@@ -394,9 +394,7 @@ def optimize_pulses(
             iter_start + 1,
         )
     result.states = fw_states_T
-    dummy = [
-                [0]*len(tlist) for _ in range(len(objectives))
-            ]
+
     # Main optimization loop
     for krotov_iteration in range(iter_start + 1, iter_stop + 1):
         # pulse update
@@ -416,14 +414,14 @@ def optimize_pulses(
         # normalizing χ improves numerical stability; the norm then has to be
         # taken into account when calculating Δϵ
         chi_states = [chi / nrm for (chi, nrm) in zip(chi_states, chi_norms)]
-
         # Backward propagation
         backward_states = parallel_map[1](
             _backward_propagation,
             list(range(len(objectives))),
             (
                 chi_states,
-                adjoint_objectives,
+                objectives,
+                #adjoint_objectives,
                 guess_pulses,
                 pulses_mapping,
                 tlist,
@@ -432,6 +430,7 @@ def optimize_pulses(
             ),
         )
 
+
         # Forward propagation and pulse update
         logger.info("Started forward propagation/pulse update")
         if True:
@@ -439,6 +438,9 @@ def optimize_pulses(
                 storage(len(tlist)) for _ in range(len(objectives))
             ]
         g_a_integrals[:] = 0.0
+        dummy = [
+                [0]*len(tlist) for _ in range(len(objectives))
+            ]
         if second_order:
             # In the update for the pulses in the first time interval, we use
             # the states at t=0. Hence, Δϕ(t=0) = 0
@@ -473,11 +475,8 @@ def optimize_pulses(
                         time_index,
                     )
                     Ψ = fw_states[i_obj]
-                    print(μ(Ψ))
-                    print(χ)
                     update = overlap(χ, μ(Ψ)).imag
-                    print(update)
-                    
+
                     update += overlap_integral(dt,tlist,time_index,backward_states[i_obj],dummy[i_obj],objectives[i_obj].H[2][0])
                     # 
                     update *= chi_norms[i_obj]
@@ -868,7 +867,8 @@ def _forward_propagation(
 def _backward_propagation(
     i_state,
     chi_states,
-    adjoint_objectives,
+    #adjoint_objectives,
+    objectives,
     pulses,
     pulses_mapping,
     tlist,
@@ -879,7 +879,8 @@ def _backward_propagation(
     logger = logging.getLogger('krotov')
     logger.info("Started backward propagation of state %d", i_state)
     state = chi_states[i_state]
-    obj = adjoint_objectives[i_state]
+    obj=objectives[i_state]
+    #obj = adjoint_objectives[i_state]
     storage_array = storage(len(tlist))
     storage_array[-1] = state
     mapping = pulses_mapping[i_state]
