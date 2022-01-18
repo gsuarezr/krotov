@@ -3,7 +3,7 @@ import inspect
 import logging
 import time
 from functools import partial
-from .Integrals import overlap2, gaussiano_norm
+from .Integrals import overlap2, gaussiano_norm, integral
 import numpy as np
 import threadpoolctl
 from qutip import Qobj
@@ -36,6 +36,7 @@ def optimize_pulses(
     objectives,
     pulse_options,
     tlist,
+    fieldcoupling,
     *,
     propagator,
     chi_constructor,
@@ -414,7 +415,6 @@ def optimize_pulses(
         # normalizing χ improves numerical stability; the norm then has to be
         # taken into account when calculating Δϵ
         chi_states = [chi / nrm for (chi, nrm) in zip(chi_states, chi_norms)]
-
         # Backward propagation
         backward_states = parallel_map[1](
             _backward_propagation,
@@ -422,6 +422,7 @@ def optimize_pulses(
             (
                 chi_states,
                 adjoint_objectives,
+                #objectives,
                 guess_pulses,
                 pulses_mapping,
                 tlist,
@@ -465,19 +466,25 @@ def optimize_pulses(
             for (i_pulse, guess_pulse) in enumerate(guess_pulses):
                 for (i_obj, objective) in enumerate(objectives):
                     χ = backward_states[i_obj][time_index]
-                    μ = mu(
+                    '''μ = mu(
                         objectives,
                         i_obj,
                         guess_pulses,
                         pulses_mapping,
                         i_pulse,
                         time_index,
-                    )
+                    )'''
+                    μ = objectives[i_obj].H[1][0]
                     Ψ = fw_states[i_obj]
-                    update = overlap(χ, μ(Ψ)).imag
+                    print(Ψ[9]*Ψ[14])
+                    print(Ψ[5]*Ψ[12])
+                  
                     
+                    #update = overlap(χ, μ(Ψ)).imag
+                    
+                    update = -fieldcoupling*(integral(χ,Ψ).imag)
  
-                    update += overlap_integral(dt,tlist,time_index,backward_states[i_obj],forward_states[i_obj],objectives[i_obj].H[2][0],objectives[i_obj].initial_state)
+                    #update += overlap_integral(dt,tlist,time_index,backward_states[i_obj],forward_states[i_obj],objectives[i_obj].H[2][0],objectives[i_obj].initial_state)
                     
                     # 
                     update *= chi_norms[i_obj]
@@ -868,6 +875,7 @@ def _backward_propagation(
     i_state,
     chi_states,
     adjoint_objectives,
+    #objectives,
     pulses,
     pulses_mapping,
     tlist,

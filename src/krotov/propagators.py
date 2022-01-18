@@ -91,18 +91,21 @@ def expm(H, state, t, dt, c_ops=None, backwards=False, initialize=False):
     if len(c_ops) > 0:
         raise NotImplementedError("Liouville exponentiation not implemented")
     assert isinstance(H, list) and len(H) > 0
-    eqm_factor = -1j  # factor in front of H on rhs of the equation of motion
+    #eqm_factor = -1j  # factor in front of H on rhs of the equation of motion
+    eqm_factor = -1
     if isinstance(H[0], list):
         if H[0][1].type == 'super':
             eqm_factor = 1
         if backwards:
-            eqm_factor = eqm_factor.conjugate()
+            #eqm_factor = eqm_factor.conjugate()
+            eqm_factor = -eqm_factor
         A = (eqm_factor * H[0][1]) * H[0][0]
     else:
         if H[0].type == 'super':
             eqm_factor = 1
         if backwards:
-            eqm_factor = eqm_factor.conjugate()
+            #eqm_factor = eqm_factor.conjugate()
+            eqm_factor = -eqm_factor
         A = eqm_factor * H[0]
     for part in H[1:2]:
         if isinstance(part, list):

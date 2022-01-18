@@ -2989,7 +2989,25 @@ def condiciones(V,B,R,S):
         print(display(Markdown('Integral in $\\alpha_{4}$  is divergent, integrand does not fulfill $Re(C_{44})<0$')))
         raise NameError("Divergencia en la integral 1")
 
-def integral(V,B,R,S):
+'''def integral(V,B,R,S):
+    condiciones(V,B,R,S)
+    a=a1(V,B,R,S)
+    b=a2(V,B,R,S)
+    c=a12(V,B,R,S)
+    d=a11(V,B,R,S)
+    e=a22(V,B,R,S)
+    f=coeffscuadraticos33(V,B)
+    g=coeffscuadraticos34(V,B)
+    h=coeffscuadraticos44(V,B)
+    i=lineal3(V,B,R,S)
+    j=lineal4(V,B,R,S)
+    return     integral_aux(a,b,c,d,e,f,g,h,i,j,V,B,R,S)'''
+
+def integral(vector1,vector2):
+    V=[[vector1[5,0],vector1[6,0],vector1[7,0],vector1[8,0]],[vector1[6,0],vector1[9,0],vector1[10,0],vector1[11,0]],[vector1[7,0],vector1[10,0],vector1[12,0],vector1[13,0]],[vector1[8,0],vector1[11,0],vector1[13,0],vector1[14,0]]]
+    R=[vector1[i,0] for i in range(1,5)]
+    B=[[vector2[5,0],vector2[6,0],vector2[7,0],vector2[8,0]],[vector2[6,0],vector2[9,0],vector2[10,0],vector2[11,0]],[vector2[7,0],vector2[10,0],vector2[12,0],vector2[13,0]],[vector2[8,0],vector2[11,0],vector2[13,0],vector2[14,0]]]
+    S=[vector2[i,0] for i in range(1,5)]
     condiciones(V,B,R,S)
     a=a1(V,B,R,S)
     b=a2(V,B,R,S)
@@ -3002,7 +3020,7 @@ def integral(V,B,R,S):
     i=lineal3(V,B,R,S)
     j=lineal4(V,B,R,S)
     return     integral_aux(a,b,c,d,e,f,g,h,i,j,V,B,R,S)
-
+    
 def fidelity(V,B,R,S):
     condiciones(V,B,R,S)
     a=a1(V,B,R,S)

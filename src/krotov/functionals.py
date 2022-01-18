@@ -192,9 +192,12 @@ def chis_ss(fw_states_T, objectives, tau_vals):
         # `obj.target` is assumed to be the "target state" (gate applied to
         # `initial_state`)
         if hasattr(obj, 'weight'):
-            res.append((τ / N) * obj.weight * obj.target)
+            #res.append((τ / N) * obj.weight * obj.target)
+            res.append(obj.weight * obj.target)
+
         else:
-            res.append((τ / N) * obj.target)
+            #res.append((τ / N) * obj.target)
+            res.append(obj.target)
     return res
 
 
