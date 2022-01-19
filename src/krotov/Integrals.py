@@ -3064,3 +3064,15 @@ def gaussiano_norm(z):
     #return np.sqrt(overlap2(z,z))
     return 1
 
+
+def coherent_overlap(vector1,vector2):
+    R=[vector1[i,0] for i in range(1,5)]
+    S=[vector2[i,0] for i in range(1,5)]
+    a=1/2*(R[0]**2+R[2]**2)+1/2*(R[1]**2+R[3]**2)
+    b=1/2*(S[0]**2+S[2]**2)+1/2*(S[1]**2+S[3]**2)
+    c=1/2*(R[0]+1j*R[2])*(S[0]-1j*S[2])+1/2*(R[1]+1j*R[3])*(S[1]-1j*S[3])
+    return np.exp(-1/2*(a+b)+c)
+
+def coherent_update(vector1,vector2):
+    R=[vector1[i,0] for i in range(1,5)]
+    return (2/np.sqrt(2))*R[0]*coherent_overlap(vector1,vector2)

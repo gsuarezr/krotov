@@ -1,7 +1,7 @@
 """Support functions for the second-order update equation"""
 from abc import ABC, abstractmethod
 from typing import Optional
-from .Integrals import overlap2
+from .Integrals import overlap2,coherent_overlap
 
 
 __all__ = ['Sigma', 'numerical_estimate_A']
@@ -87,7 +87,8 @@ def overlap_integral(dt,tlist,time_index,estado1,estado2,H):
     suma=0
     for i in range(len(tlist)-1):
         if time_index>=i:               
-            suma+=(0.5*dt*overlap2(estado1[i],H(estado2[i]))).imag
+            #suma+=(0.5*dt*overlap2(estado1[i],H(estado2[i]))).imag
+            suma+=(0.5*dt*coherent_overlap(estado1[i],H(estado2[i]))).imag
     return suma
 
 def numerical_estimate_A(
