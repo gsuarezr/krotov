@@ -484,7 +484,7 @@ def optimize_pulses(
                     
                     #update = -fieldcoupling*(integral(χ,Ψ).imag)
  
-                    update += overlap_integral(dt,tlist,time_index,backward_states[i_obj],forward_states[i_obj],objectives[i_obj].H[2][0],objectives[i_obj].initial_state)
+                    update += overlap_integral(dt,tlist,time_index,backward_states[i_obj],forward_states[i_obj],objectives[i_obj].H[2][0])
                     
                     # 
                     update *= chi_norms[i_obj]
