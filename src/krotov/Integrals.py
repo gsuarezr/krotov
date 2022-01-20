@@ -3075,4 +3075,5 @@ def coherent_overlap(vector1,vector2):
 
 def coherent_update(vector1,vector2):
     R=[vector1[i,0] for i in range(1,5)]
-    return (2/np.sqrt(2))*R[0]*coherent_overlap(vector1,vector2)
+    S=[vector2[i,0] for i in range(1,5)]
+    return (1/np.sqrt(2)*(R[0]+1j*R[2])+1/np.sqrt(2)*(S[0]-1j*S[2]))*coherent_overlap(vector1,vector2)
