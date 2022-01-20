@@ -483,8 +483,8 @@ def optimize_pulses(
                     #update = overlap(χ, μ(Ψ)).imag
                     
                     #update = -fieldcoupling*(integral(χ,Ψ).imag)
-                    
-                    update = -fieldcoupling*(coherent_update(χ,Ψ).imag)
+                    #el primero es el ket
+                    update = -fieldcoupling*(coherent_update(Ψ,χ).imag)
  
                     #update += overlap_integral(dt,tlist,time_index,backward_states[i_obj],forward_states[i_obj],objectives[i_obj].H[2][0])
                     

@@ -2,7 +2,7 @@ import numpy as np
 from IPython.display import display, Markdown
 
 
-__all__ =['gaussiano_norm','overlap2']
+__all__ =['gaussiano_norm','overlap2','coherent_overlap','coherent_update']
 
 def separate(V,row):
     return V[row][0],V[row][1],V[row][2],V[row][3]
