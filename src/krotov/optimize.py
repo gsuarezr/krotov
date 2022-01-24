@@ -569,7 +569,7 @@ def optimize_pulses(
             # we need to make a copy, so that the conversion in "Finalize"
             # doesn't affect `all_pulses` as well.
             result.all_pulses.append(copy.deepcopy(optimized_pulses))
-        result.states = fw_states_T
+        result.states = forward_states
 
         logger.info("Finished Krotov iteration %d", krotov_iteration)
 
