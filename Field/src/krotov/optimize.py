@@ -421,8 +421,8 @@ def optimize_pulses(
             list(range(len(objectives))),
             (
                 chi_states,
-                adjoint_objectives,
-                #objectives,
+                #adjoint_objectives,
+                objectives,
                 guess_pulses,
                 pulses_mapping,
                 tlist,
@@ -569,7 +569,7 @@ def optimize_pulses(
             # we need to make a copy, so that the conversion in "Finalize"
             # doesn't affect `all_pulses` as well.
             result.all_pulses.append(copy.deepcopy(optimized_pulses))
-        result.states = fw_states_T
+        result.states = forward_states
 
         logger.info("Finished Krotov iteration %d", krotov_iteration)
 
@@ -877,8 +877,8 @@ def _forward_propagation(
 def _backward_propagation(
     i_state,
     chi_states,
-    adjoint_objectives,
-    #objectives,
+    #adjoint_objectives,
+    objectives,
     pulses,
     pulses_mapping,
     tlist,
@@ -889,8 +889,8 @@ def _backward_propagation(
     logger = logging.getLogger('krotov')
     logger.info("Started backward propagation of state %d", i_state)
     state = chi_states[i_state]
-    #obj=objectives[i_state]
-    obj = adjoint_objectives[i_state]
+    obj=objectives[i_state]
+    #obj = adjoint_objectives[i_state]
     storage_array = storage(len(tlist))
     storage_array[-1] = state
     mapping = pulses_mapping[i_state]
