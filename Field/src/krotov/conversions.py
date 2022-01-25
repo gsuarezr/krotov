@@ -327,8 +327,8 @@ def plug_in_pulse_values(H, pulses, mapping, time_index, conjugate=False,tlist=[
         H[2][1]=0
         
     else:
-        H[2][1]=simpson(np.array(pulses[0])[:time_index], np.array(tlist)[:time_index])
-        #H[2][1]= (pulses[0][time_index]-pulses[0][time_index-1])/dt
+        #H[2][1]=simpson(np.array(pulses[0])[:time_index], np.array(tlist)[:time_index])
+        H[2][1]= (pulses[0][time_index]-pulses[0][time_index-1])/dt
         
     for (pulse, pulse_mapping) in zip(pulses, mapping):
         for i in pulse_mapping:
