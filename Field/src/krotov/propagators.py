@@ -1,22 +1,17 @@
 r"""Routines that can be passed as `propagator` to :func:`.optimize_pulses`
-
 The numerical effort involved in the optimization is almost entirely within the
 simulation of the system dynamics. In every iteration and for every objective,
 the system must be "propagated" once forwards in time and once backwards in
 time, see also :mod:`krotov.parallelization`.
-
 The implementation of this time propagation must be inside the user-supplied
 routine `propagator` that is passed to :func:`.optimize_pulses` and must
 calculate the propagation over a single time step. In particular,
 :func:`qutip.mesolve.mesolve` is not automatically used for simulating any
 dynamics within the optimization.  The signature for any `propagator`
 must be the same as the "reference" :func:`expm` propagator:
-
     >>> str(inspect.signature(krotov.propagators.expm))
     '(H, state, dt, c_ops=None, backwards=False, initialize=False)'
-
 The arguments are as follows (cf. :class:`Propagator`):
-
 * `H` is the system Hamiltonian or Liouvillian, in a nested-list format similar
   to that used by :func:`qutip.mesolve.mesolve`, e.g., for a Hamiltonian
   $\Op{H} = \Op{H}_0 + c \Op{H}_1$, where $c$ is the value of a control field
@@ -45,7 +40,6 @@ The arguments are as follows (cf. :class:`Propagator`):
   propagation over a time grid. If False in subsequent calls, the `propagator`
   may assume that the input `state` is the result of the previous call to
   `propagator`.
-
 .. warning::
     The routines in this module are provided with no guarantee to be either
     general or efficient. The :func:`expm` propagator is exact to machine
@@ -53,13 +47,11 @@ The arguments are as follows (cf. :class:`Propagator`):
     recommended to supply a problem-specific `propagator` that is highly
     optimized for speed. You might consider the use of Cython_. This is key to
     minimize the runtime of the optimization.
-
 The `initialize` flag enables "stateful" propagators that cache data between
 calls. This can significantly improve numerical efficiency.
 :class:`DensityMatrixODEPropagator` is an example for such a propagator. In
 general, any stateful `propagator` should be an instance of
 :class:`Propagator`.
-
 .. _Cython: https://cython.org
 """
 from abc import ABC, abstractmethod
@@ -71,14 +63,13 @@ import threadpoolctl
 from qutip.cy.spconvert import dense2D_to_fastcsr_fmode
 from qutip.cy.spmatfuncs import spmvpy_csr
 from qutip.superoperator import mat2vec, vec2mat
-import scipy.integrate as integrate
+
 
 __all__ = ['expm', 'Propagator', 'DensityMatrixODEPropagator']
 
 
-def expm(H, state, t, dt, c_ops=None, backwards=False, initialize=False):
+def expm(H, state, dt, c_ops=None, backwards=False, initialize=False):
     """Propagate using matrix exponentiation.
-
     This supports `H` being a Hamiltonian (for a Hilbert space `state`) or a
     Liouvillian (for `state` being a density matrix) in nested-list format.
     Collapse operators `c_ops` are not supported. The propagator is not
@@ -98,7 +89,7 @@ def expm(H, state, t, dt, c_ops=None, backwards=False, initialize=False):
             eqm_factor = 1
         if backwards:
             #eqm_factor = eqm_factor.conjugate()
-            eqm_factor = -eqm_factor
+            eqm_factor= -eqm_factor
         A = (eqm_factor * H[0][1]) * H[0][0]
     else:
         if H[0].type == 'super':
@@ -107,16 +98,9 @@ def expm(H, state, t, dt, c_ops=None, backwards=False, initialize=False):
             #eqm_factor = eqm_factor.conjugate()
             eqm_factor = -eqm_factor
         A = eqm_factor * H[0]
-    for part in H[1:2]:
+    for part in H[1:]:
         if isinstance(part, list):
             A += (eqm_factor * part[1]) * part[0]
-        else:
-            A += eqm_factor * part
-    for part in H[2:]:
-        if isinstance(part,list):
-     #       part[1]=integrate.quad(lambda x: part[1],0,t) #  No se si a este t
-            A += (eqm_factor * part[1]) * part[0]
-            
         else:
             A += eqm_factor * part
     ok_types = (state.type == 'oper' and A.type == 'super') or (
@@ -137,10 +121,9 @@ class Propagator(ABC):
 
     @abstractmethod
     def __call__(
-        self, H, state, t, dt, c_ops=None, backwards=False, initialize=False
+        self, H, state, dt, c_ops=None, backwards=False, initialize=False
     ):
         """Evaluation of a single propagation step
-
         Args:
             H (list): A Hamiltonian or Liouvillian in qutip's nested-list
                 format, with a scalar value in the place of a time-dependency.
@@ -160,7 +143,6 @@ class Propagator(ABC):
                 on a time grid, `initialize` should be passed as True for the
                 initial time step (0 to `dt` in a forward propagation, or T to
                 T-dt for a backward propagation), and False otherwise.
-
         Note:
             A propagator may assume the propagation to be "sequential"
             when `initialize` is False. That is, the state to propagate is the
@@ -171,11 +153,9 @@ class Propagator(ABC):
 
 class DensityMatrixODEPropagator(Propagator):
     """Propagator for density matrix evolution under a Lindbladian
-
     See :class:`qutip.solver.Options` for all arguments except `reentrant`.
     Passing True for the `reentrant` re-initializes the propagator in every
     time step.
-
     Warning:
         By default, the propagator is not "re-entrant". That is, you cannot use
         more than one instance of :class:`DensityMatrixODEPropagator` in the
@@ -219,7 +199,6 @@ class DensityMatrixODEPropagator(Propagator):
         self, H, state, dt, c_ops=None, backwards=False, initialize=False
     ):
         """Evaluation of a single propagation step
-
         Args:
             H (list): A Liouvillian superoperator in qutip's nested-list
                 format, with a scalar value in the place of a time-dependency.

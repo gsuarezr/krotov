@@ -1,15 +1,22 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Feb  7 11:23:29 2022
+
+@author: Ricard
+"""
+
+
 import copy
 import inspect
 import logging
 import time
 from functools import partial
 from .Integrals import overlap2, gaussiano_norm, integral, coherent_overlap, coherent_update
+
 import numpy as np
 import threadpoolctl
 from qutip import Qobj
 from qutip.parallel import serial_map
-from scipy.integrate import quad
-
 
 from .conversions import (
     control_onto_interval,
@@ -25,7 +32,7 @@ from .mu import derivative_wrt_pulse
 from .parallelization import USE_THREADPOOL_LIMITS
 from .propagators import Propagator, expm
 from .result import Result
-from .second_order import _overlap,overlap_integral
+from .second_order import _overlap
 from .shapes import one_shape, zero_shape
 
 
@@ -57,10 +64,8 @@ def optimize_pulses(
     limit_thread_pool=None
 ):
     r"""Use Krotov's method to optimize towards the given `objectives`.
-
     Optimize all time-dependent controls found in the Hamiltonians or
     Liouvillians of the given `objectives`.
-
     Args:
         objectives (list[Objective]): List of objectives
         pulse_options (dict): Mapping of time-dependent controls found in the
@@ -70,12 +75,10 @@ def optimize_pulses(
             options for a control that is an array must be set using the key
             ``id(control)`` (see the example below). The options of any
             particular control *must* contain the following keys:
-
             * ``'lambda_a'``: the Krotov step size (float value). This governs
               the overall magnitude of the pulse update. Large values result in
               small updates. Small values may lead to sharp spikes and
               numerical instability.
-
             * ``'update_shape'`` : Function S(t) in the range [0, 1] that
               scales the pulse update for the pulse value at t. This can be
               used to ensure boundary conditions (S(0) = S(T) = 0), and enforce
@@ -83,35 +86,24 @@ def optimize_pulses(
               takes a single argument `t`; or the values 1 or 0 for a constant
               update-shape. The value 0 disables the optimization of that
               particular control.
-
             In addition, the following keys *may* occur:
-
             * ``'args'``: If the control is a callable with arguments
               ``(t, args)`` (as required by QuTiP), a dict of argument values
               to pass as `args`. If ``'args'`` is not specified via the
               `pulse_options`, controls will be discretized using the default
               ``args=None``.
-
             For example, for `objectives` that contain a Hamiltonian of the
             form ``[H0, [H1, u], [H2, g]]``, where ``H0``, ``H1``, and ``H2``
             are :class:`~qutip.Qobj` instances, ``u`` is a numpy array
-
             .. doctest::
-
                 >>> u = numpy.zeros(1000)
-
             and ``g`` is a control function
-
             .. doctest::
-
                 >>> def g(t, args):
                 ...     E0 = args.get('E0', 0.0)
                 ...     return E0
-
             then a possible value for `pulse_options` would look like this:
-
             .. doctest::
-
                 >>> from krotov.shapes import flattop
                 >>> from functools import partial
                 >>> pulse_options = {
@@ -124,10 +116,8 @@ def optimize_pulses(
                 ...         args=dict(E0=1.0)
                 ...     )
                 ... }
-
             The use of :class:`dict` and the ``{...}`` syntax are completely
             equivalent, but :class:`dict` is better for nested indentation.
-
         tlist (numpy.ndarray): Array of time grid values, cf.
             :func:`~qutip.mesolve.mesolve`
         propagator (callable or list[callable]): Function that propagates the
@@ -218,10 +208,8 @@ def optimize_pulses(
             to place no restrictions on multi-threading. The default value
             (None) delegates to
             :obj:`krotov.parallelization.USE_THREADPOOL_LIMITS`.
-
     Returns:
         Result: The result of the optimization.
-
     Raises:
         ValueError: If any controls are not real-valued, or if any update
             shape is not a real-valued function in the range [0, 1]; if using
@@ -248,8 +236,6 @@ def optimize_pulses(
         norm=gaussiano_norm
     if overlap is None:
         overlap = _overlap
-
-
     if modify_params_after_iter is not None:
         # From a technical perspective, the `modify_params_after_iter` is
         # really just another info_hook, the only difference is the
@@ -327,13 +313,13 @@ def optimize_pulses(
             for (state_T, obj) in zip(fw_states_T, objectives)
         ]
     )
-    forward_states0 = forward_states
-    #if second_order:
-        #forward_states0 = forward_states  # ∀t: Δϕ=0, for iteration 0
-    #else:
+
+    if second_order:
+        forward_states0 = forward_states  # ∀t: Δϕ=0, for iteration 0
+    else:
         # the forward-propagated states only need to be stored for the second
         # order update
-        #forward_states0 = forward_states = None
+        forward_states0 = forward_states = None
 
     info = None
     optimized_pulses = copy.deepcopy(guess_pulses)
@@ -398,7 +384,7 @@ def optimize_pulses(
 
     # Main optimization loop
     for krotov_iteration in range(iter_start + 1, iter_stop + 1):
-        # pulse update
+
         logger.info("Started Krotov iteration %d", krotov_iteration)
         tic = time.time()
 
@@ -415,14 +401,15 @@ def optimize_pulses(
         # normalizing χ improves numerical stability; the norm then has to be
         # taken into account when calculating Δϵ
         chi_states = [chi / nrm for (chi, nrm) in zip(chi_states, chi_norms)]
+
         # Backward propagation
         backward_states = parallel_map[1](
             _backward_propagation,
             list(range(len(objectives))),
             (
                 chi_states,
-                #adjoint_objectives,
                 objectives,
+                #adjoint_objectives,
                 guess_pulses,
                 pulses_mapping,
                 tlist,
@@ -448,56 +435,42 @@ def optimize_pulses(
         if second_order:
             for i_obj in range(len(objectives)):
                 forward_states[i_obj][0] = objectives[i_obj].initial_state
+        delta_eps = [
+            np.zeros(len(tlist) - 1, dtype=np.complex128) for _ in guess_pulses
+        ]
         forward_states = [
                 storage(len(tlist)) for _ in range(len(objectives))
             ]
         for i_obj in range(len(objectives)):
                 forward_states[i_obj][0] = objectives[i_obj].initial_state
-        delta_eps = [
-            np.zeros(len(tlist) - 1, dtype=np.complex128) for _ in guess_pulses
-        ]
         optimized_pulses = copy.deepcopy(guess_pulses)
         fw_states = [obj.initial_state for obj in objectives]
         for time_index in range(len(tlist) - 1):  # iterate over time intervals
             dt = tlist[time_index + 1] - tlist[time_index]
             if second_order:
                 σ = sigma(tlist[time_index] + 0.5 * dt)
-        
+            # pulse update
             for (i_pulse, guess_pulse) in enumerate(guess_pulses):
                 for (i_obj, objective) in enumerate(objectives):
                     χ = backward_states[i_obj][time_index]
-                    '''μ = mu(
+                    μ = mu(
                         objectives,
                         i_obj,
                         guess_pulses,
                         pulses_mapping,
                         i_pulse,
                         time_index,
-                    )'''
-                    μ = objectives[i_obj].H[1][0]
+                    )
                     Ψ = fw_states[i_obj]
-                    
-                    
-                  
-                    
-                    #update = coherent_overlap(μ(Ψ),χ).imag
-                    
-                    #update = -fieldcoupling*(integral(χ,Ψ).imag)
-                    #el primero es el ket
-                    update = -fieldcoupling*(coherent_update(Ψ,χ).imag)
-
- 
-                    #update += overlap_integral(dt,tlist,time_index,backward_states[i_obj],forward_states[i_obj],objectives[i_obj].H[2][0])
-                    
-                    # 
+                    update = -fieldcoupling*(coherent_update(Ψ,χ)) # ⟨χ|μ|Ψ⟩ ∈ ℂ
                     update *= chi_norms[i_obj]
                     if second_order:
                         update += 0.5 * σ * overlap(delta_phis[i_obj], μ(Ψ))
                     delta_eps[i_pulse][time_index] += update
                 λₐ = lambda_vals[i_pulse]
                 S_t = shape_arrays[i_pulse][time_index]
-                Δϵ_1 = delta_eps[i_pulse][time_index]# for "step size" 1
-                Δϵ = (S_t / λₐ) * np.real(Δϵ_1)  # ∈ ℝ
+                Δϵ_1 = delta_eps[i_pulse][time_index].imag  # for "step size" 1
+                Δϵ = (S_t / λₐ) * Δϵ_1  # ∈ ℝ
                 g_a_integrals[i_pulse] += (S_t / λₐ) * abs(Δϵ_1) ** 2 * dt
                 # dt may vary! -- hence we've included it in each summand
                 optimized_pulses[i_pulse][time_index] += Δϵ
@@ -534,7 +507,6 @@ def optimize_pulses(
                 for (fw_state_T, obj) in zip(fw_states_T, objectives)
             ]
         )
-
         toc = time.time()
 
         # Display information about iteration
@@ -650,7 +622,6 @@ def _enforce_shape_array_range(shape_array):
 
 def _check_propagators_interface(propagators, logger):
     """Warn if any of the propagators do not have the expected interface.
-
     In order to pass muster, each propagator must either have the same
     interface as :func:`krotov.propagators.expm`, or
     :meth:`krotov.propagators.Propagator.__call__`
@@ -734,7 +705,6 @@ def _initialize_krotov_controls(objectives, pulse_options, tlist):
 
 def _restore_from_previous_result(result, objectives, tlist, store_all_pulses):
     """Load `guess_controls` and `guess_pulses` from the given Result object.
-
     Raises:
         ValueError: if `result` is incompatible with the given `objectives` and
             `tlist`.
@@ -854,14 +824,14 @@ def _forward_propagation(
         storage_array[0] = state
     mapping = pulses_mapping[i_objective]
     for time_index in range(len(tlist) - 1):  # index over intervals
-        H = plug_in_pulse_values(obj.H, pulses, mapping[0], time_index,tlist=tlist)
+        H = plug_in_pulse_values(obj.H, pulses, mapping[0], time_index)
         c_ops = [
-            plug_in_pulse_values(c_op, pulses, mapping[ic + 1], time_index,tlist=tlist)
+            plug_in_pulse_values(c_op, pulses, mapping[ic + 1], time_index)
             for (ic, c_op) in enumerate(obj.c_ops)
         ]
         dt = tlist[time_index + 1] - tlist[time_index]
         state = propagators[i_objective](
-            H, state,tlist[time_index], dt, c_ops, initialize=(time_index == 0)
+            H, state, dt, c_ops, initialize=(time_index == 0)
         )
         if store_all:
             storage_array[time_index + 1] = state
@@ -877,8 +847,8 @@ def _forward_propagation(
 def _backward_propagation(
     i_state,
     chi_states,
-    #adjoint_objectives,
     objectives,
+    #adjoint_objectives,
     pulses,
     pulses_mapping,
     tlist,
@@ -889,24 +859,23 @@ def _backward_propagation(
     logger = logging.getLogger('krotov')
     logger.info("Started backward propagation of state %d", i_state)
     state = chi_states[i_state]
-    obj=objectives[i_state]
+    obj = objectives[i_state]
     #obj = adjoint_objectives[i_state]
     storage_array = storage(len(tlist))
     storage_array[-1] = state
     mapping = pulses_mapping[i_state]
     for time_index in range(len(tlist) - 2, -1, -1):  # index bw over intervals
         H = plug_in_pulse_values(
-            obj.H, pulses, mapping[0], time_index, conjugate=True,tlist=tlist
+            obj.H, pulses, mapping[0], time_index, conjugate=True
         )
         c_ops = [
-            plug_in_pulse_values(c_op, pulses, mapping[ic + 1], time_index,tlist=tlist)
+            plug_in_pulse_values(c_op, pulses, mapping[ic + 1], time_index)
             for (ic, c_op) in enumerate(obj.c_ops)
         ]
         dt = tlist[time_index + 1] - tlist[time_index]
         state = propagators[i_state](
             H,
             state,
-            tlist[time_index],
             dt,
             c_ops,
             backwards=True,
@@ -931,12 +900,12 @@ def _forward_propagation_step(
     state = states[i_state]
     obj = objectives[i_state]
     mapping = pulses_mapping[i_state]
-    H = plug_in_pulse_values(obj.H, pulses, mapping[0], time_index,tlist=tlist)
+    H = plug_in_pulse_values(obj.H, pulses, mapping[0], time_index)
     c_ops = [
-        plug_in_pulse_values(c_op, pulses, mapping[ic + 1], time_index,tlist=tlist)
+        plug_in_pulse_values(c_op, pulses, mapping[ic + 1], time_index)
         for (ic, c_op) in enumerate(obj.c_ops)
     ]
     dt = tlist[time_index + 1] - tlist[time_index]
     return propagators[i_state](
-        H, state, tlist[time_index],dt, c_ops, initialize=(time_index == 0)
+        H, state, dt, c_ops, initialize=(time_index == 0)
     )
