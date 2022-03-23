@@ -421,6 +421,8 @@ def optimize_pulses(
             list(range(len(objectives))),
             (
                 chi_states,
+                
+                
                 adjoint_objectives,
                 #objectives,
                 guess_pulses,
@@ -474,20 +476,19 @@ def optimize_pulses(
                         i_pulse,
                         time_index,
                     )'''
-                    μ = objectives[i_obj].H[1][0]
+                    μ = 1j*objectives[i_obj].H[1][0]
                     Ψ = fw_states[i_obj]
                     
                     
                   
-                    
-                    update = (coherent_overlap(μ(Ψ),χ)).imag
+                    update = (-1j*coherent_overlap(μ(Ψ),χ)).imag
                     
                     #update = -fieldcoupling*(integral(χ,Ψ).imag)
                     #el primero es el ket
                     #update = -fieldcoupling*(coherent_update(Ψ,χ).imag)
 
  
-                    update += overlap_integral(dt,tlist,time_index,backward_states[i_obj],forward_states[i_obj],objectives[i_obj].H[2][0])
+                    update += overlap_integral(dt,tlist,time_index,backward_states[i_obj],forward_states[i_obj],1j*objectives[i_obj].H[2][0])
                     
                     # 
                     update *= chi_norms[i_obj]
