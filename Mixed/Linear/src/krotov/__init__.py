@@ -55,7 +55,7 @@ from . import (
 from .objectives import Objective, ensemble_objectives, gate_objectives
 from .optimize import optimize_pulses
 from .result import Result
-from .Integrals import overlap2
+from .Integrals import integral,fidelity_sq
 
 
 __all__ = [
@@ -64,5 +64,6 @@ __all__ = [
     'ensemble_objectives',
     'gate_objectives',
     'optimize_pulses',
-    'overlap2'
+    'integral',
+    'fidelity_sq'
 ]
