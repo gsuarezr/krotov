@@ -2835,13 +2835,16 @@ def a1(V,B,R,S):
     c33=coeffscuadraticos33(V,B)
     c34=coeffscuadraticos34(V,B)
     c44=coeffscuadraticos44(V,B)
-    aux0=(c1*(c24**2))+((2.*(c14*(c22*c4)))+((2.*(c12*(c2*c44)))+(-4.*(c1*(c22*c44)))));
-    output=((aux0-(c12*(c24*c4)))-(c14*(c2*c24)))/((c24**2)+(-4.*(c22*c44)));
-
+    aux0=((2.*(c13*(c3*c44)))/((c34**2)+(-4.*(c33*c44))))+((-4.*(c1*(c33*\
+    c44)))/((c34**2)+(-4.*(c33*c44))));
+    aux1=((c1*(c34**2))/((c34**2)+(-4.*(c33*c44))))+(((2.*(c14*(c33*c4)))/\
+    ((c34**2)+(-4.*(c33*c44))))+aux0);
+    output=(aux1-((c13*(c34*c4))/((c34**2)+(-4.*(c33*c44)))))-((c14*(c3*\
+    c34))/((c34**2)+(-4.*(c33*c44))));
     return output
 
 
-def a3(V,B,R,S):
+def a2(V,B,R,S):
     c1=lineal1(V,B,R,S)
     c2=lineal2(V,B,R,S)
     c3=lineal3(V,B,R,S)
@@ -2856,12 +2859,15 @@ def a3(V,B,R,S):
     c33=coeffscuadraticos33(V,B)
     c34=coeffscuadraticos34(V,B)
     c44=coeffscuadraticos44(V,B)
-    aux0=((c24**2)*c3)+((2.*(c22*(c34*c4)))+((2.*(c2*(c23*c44)))+(-4.*(c22*(c3*c44)))));
-    output=((aux0-(c23*(c24*c4)))-(c2*(c24*c34)))/((c24**2)+(-4.*(c22*c44)));
-
+    aux0=((2.*(c23*(c3*c44)))/((c34**2)+(-4.*(c33*c44))))+((-4.*(c2*(c33*\
+    c44)))/((c34**2)+(-4.*(c33*c44))));
+    aux1=((c2*(c34**2))/((c34**2)+(-4.*(c33*c44))))+(((2.*(c24*(c33*c4)))/\
+    ((c34**2)+(-4.*(c33*c44))))+aux0);
+    output=(aux1-((c23*(c34*c4))/((c34**2)+(-4.*(c33*c44)))))-((c24*(c3*\
+    c34))/((c34**2)+(-4.*(c33*c44))));
     return output
 
-def a13(V,B,R,S):
+def a12(V,B,R,S):
     c1=lineal1(V,B,R,S)
     c2=lineal2(V,B,R,S)
     c3=lineal3(V,B,R,S)
@@ -2876,11 +2882,12 @@ def a13(V,B,R,S):
     c33=coeffscuadraticos33(V,B)
     c34=coeffscuadraticos34(V,B)
     c44=coeffscuadraticos44(V,B)
-    aux0=(c13*(c24**2))+((2.*(c14*(c22*c34)))+((-4.*(c13*(c22*c44)))+(2.*(c12*(c23*c44)))));
-    output=((aux0-(c12*(c24*c34)))-(c14*(c23*c24)))/((c24**2)+(-4.*(c22*c44)));
-
+    aux0=((2.*(c13*(c23*c44)))/((c34**2)+(-4.*(c33*c44))))+((c33*((2.*(\
+    c14*c24))+(-4.*(c12*c44))))/((c34**2)+(-4.*(c33*c44))));
+    aux1=(((c12*(c34**2))/((c34**2)+(-4.*(c33*c44))))+aux0)-((c13*(c24*\
+    c34))/((c34**2)+(-4.*(c33*c44))));
+    output=aux1-((c14*(c23*c34))/((c34**2)+(-4.*(c33*c44))));
     return output
-
 
 def a11(V,B,R,S):
     c1=lineal1(V,B,R,S)
@@ -2897,12 +2904,14 @@ def a11(V,B,R,S):
     c33=coeffscuadraticos33(V,B)
     c34=coeffscuadraticos34(V,B)
     c44=coeffscuadraticos44(V,B)
-    aux0=(((c14**2)*c22)+((c11*(c24**2))+(((c12**2)*c44)+(-4.*(c11*(c22*c44))))))-(c12*(c14*c24));
-    output=aux0/((c24**2)+(-4.*(c22*c44)));
-
+    aux0=(((c13**2)*c44)/((c34**2)+(-4.*(c33*c44))))+((-4.*(c11*(c33*c44))\
+    )/((c34**2)+(-4.*(c33*c44))));
+    aux1=(((c14**2)*c33)/((c34**2)+(-4.*(c33*c44))))+(((c11*(c34**2))/((\
+    c34**2)+(-4.*(c33*c44))))+aux0);
+    output=aux1-((c13*(c14*c34))/((c34**2)+(-4.*(c33*c44))));
     return output
 
-def a33(V,B,R,S):
+def a22(V,B,R,S):
     c1=lineal1(V,B,R,S)
     c2=lineal2(V,B,R,S)
     c3=lineal3(V,B,R,S)
@@ -2917,60 +2926,154 @@ def a33(V,B,R,S):
     c33=coeffscuadraticos33(V,B)
     c34=coeffscuadraticos34(V,B)
     c44=coeffscuadraticos44(V,B)
-    aux0=(((c24**2)*c33)+((c22*(c34**2))+(((c23**2)*c44)+(-4.*(c22*(c33*c44))))))-(c23*(c24*c34));
-    output=aux0/((c24**2)+(-4.*(c22*c44)));
-
+    aux0=(((c23**2)*c44)/((c34**2)+(-4.*(c33*c44))))+((-4.*(c22*(c33*c44))\
+    )/((c34**2)+(-4.*(c33*c44))));
+    aux1=(((c24**2)*c33)/((c34**2)+(-4.*(c33*c44))))+(((c22*(c34**2))/((\
+    c34**2)+(-4.*(c33*c44))))+aux0);
+    output=aux1-((c23*(c24*c34))/((c34**2)+(-4.*(c33*c44))));
     return output
 
 
-def independiente_transformado(c2,c4,c24,c22,c44):
-   return (((c22*(c4**2))+((c2**2)*c44))-(c2*(c24*c4)))/((c24**2)+(-4.*(c22*c44)));
+def independiente_transformado(c3,c4,c34,c33,c44):
+   return (((c33*(c4**2))+((c3**2)*c44))-(c3*(c34*c4)))/((c34**2)+(-4.*(c33*c44)));
 
 
 
-
-
-
-
-
-def update_aux(a1,a3,a13,a11,a33,c22,c24,c44,c2,c4,V,B,R,S):
-
-
-
- 
-
-    aux0=(4.*(a1*(a13*(a3*(a11-a33)))))+(((a13**2)*((a3**2)+(2.*a33)))+(-2.*(a11*((a13**2)+(4.*(a33**2))))));
-    aux1=((-4.*((a11**2)*((a3**2)+(-2.*a33))))+aux0)-((a1**2)*((a13**2)+(-4.*(a33**2))));
-    aux2=(((a11*(a3**2))+((a1**2)*a33))-(a1*(a13*a3)))/((a13**2)+(-4.*(a11*a33)));
-    aux3=(((-4.*c22)+((c24**2)/c44))**-0.5)*(((-c44)**-0.5)*((np.exp(aux2))*(np.pi**2)));
-    aux4=(((-4.*a11)+((a13**2)/a33))**-0.5)*(((-a33)**-0.5)*((((a13**2)+(-4.*(a11*a33)))**-2.)*(aux1*aux3)));
-    output=8.*aux4;
-
-
-
-    independientes=np.exp(independiente_transformado(c2,c4,c24,c22,c44))*np.exp(independiente(V,B,R,S))
+def integral_aux(a1,a2,a12,a11,a22,c33,c34,c44,c3,c4,V,B,R,S):
+    aux0=(((a11*(a2**2))+((a1**2)*a22))-(a1*(a12*a2)))/((a12**2)+(-4.*(a11*a22)));
+    aux1=(((-4.*c33)+((c34**2)/c44))**-0.5)*(((-c44)**-0.5)*((np.exp(aux0))*(np.pi**2)));
+    aux2=a22*(((2.*(a1*a22))-(a12*a2))*((((a12**2)+(-4.*(a11*a22)))**-2.)*aux1));
+    output=8.*((np.sqrt(((-4.*a11)+((a12**2)/a22))))*(((-a22)**-0.5)*aux2));
+    independientes=np.exp(independiente_transformado(c3,c4,c34,c33,c44))*np.exp(independiente(V,B,R,S))
     det1=(np.linalg.det(np.array(V)+(1/2)*np.eye(4)))**(1/4)
     det2=(np.linalg.det(np.array(B)+(1/2)*np.eye(4)))**(1/4)
     cons= 1/(2*np.pi)*1/(2*np.pi)
-    return (independientes*output*cons)/(det1*det2*2)
+    return (independientes*output*cons)/(det1*det2*np.sqrt(2))
 
+def fidelidad_aux(a1,a2,a12,a11,a22,c33,c34,c44,c3,c4,V,B,R,S):
+    aux0 = (((a11 * (a2 ** 2)) + ((a1 ** 2) * a22)) - (a1 * (a12 * a2))) / ((a12 ** 2) + (-4. * (a11 * a22)));
+    aux1 = (((-4. * c33) + ((c34 ** 2) / c44)) ** -0.5) * (((-c44) ** -0.5) * ((np.exp(aux0)) * (np.pi ** 2)));
+    output = 4. * ((((-4. * a11) + ((a12 ** 2) / a22)) ** -0.5) * (((-a22) ** -0.5) * aux1));
+    independientes = np.exp(independiente_transformado(c3, c4, c34, c33, c44)) * np.exp(independiente(V, B, R, S))
+    det1 = (np.linalg.det(np.array(V) + (1 / 2) * np.eye(4))) ** (1 / 4)
+    det2 = (np.linalg.det(np.array(B) + (1 / 2) * np.eye(4))) ** (1 / 4)
+    cons= 1/(4*np.pi**2)
+    fid=(independientes*output*cons)/(det1*det2)
+    return fid*np.conjugate(fid)
 
+def overlap_aux(a1,a2,a12,a11,a22,c33,c34,c44,c3,c4,V,B,R,S):
+    aux0 = (((a11 * (a2 ** 2)) + ((a1 ** 2) * a22)) - (a1 * (a12 * a2))) / ((a12 ** 2) + (-4. * (a11 * a22)));
+    aux1 = (((-4. * c33) + ((c34 ** 2) / c44)) ** -0.5) * (((-c44) ** -0.5) * ((np.exp(aux0)) * (np.pi ** 2)));
+    output = 4. * ((((-4. * a11) + ((a12 ** 2) / a22)) ** -0.5) * (((-a22) ** -0.5) * aux1));
+    independientes = np.exp(independiente_transformado(c3, c4, c34, c33, c44)) * np.exp(independiente(V, B, R, S))
+    det1 = (np.linalg.det(np.array(V) + (1 / 2) * np.eye(4))) ** (1 / 4)
+    det2 = (np.linalg.det(np.array(B) + (1 / 2) * np.eye(4))) ** (1 / 4)
+    cons= 1/(4*np.pi**2)
+    fid=(independientes*output*cons)/(det1*det2)
+    return fid
 
-def update_squeezed(vector1,vector2):
+def condiciones(V,B,R,S):
+    if np.real(coeffscuadraticos44(V,B)) < 0:
+        if np.real(coeffscuadraticos33(V,B)- (coeffscuadraticos34(V,B)**2)/(4*coeffscuadraticos44(V,B)))<=0:
+            if (np.real(a22(V,B,R,S))<0):
+                if np.real(-4*a11(V,B,R,S)+(a12(V,B,R,S)**2 /a22(V,B,R,S)))>0:
+                    return 1
+                else:
+                    print(display(Markdown('Integral in $\\alpha_{4}$  is divergent, integrand does not fulfill $Re(C_{44})<0$')))
+                    #print(R,V,S,B)
+                    raise NameError("Divergencia en la integral 1")
+            else:
+               #print(R,V,S,B)
+               raise NameError(display(Markdown('Integral in $\\alpha_{4}$  is divergent, integrand does not fulfill $Re(C_{44})<0$')))
+        else:
+            #print(R,V,S,B)
+            raise NameError(display(Markdown('Integral in $\\alpha_{4}$  is divergent, integrand does not fulfill $Re(C_{44})<0$')))
+    else:
+        print(display(Markdown('Integral in $\\alpha_{4}$  is divergent, integrand does not fulfill $Re(C_{44})<0$')))
+        #print(R,V,S,B)
+        raise NameError("Divergencia en la integral 1")
+
+'''def integral(V,B,R,S):
+    condiciones(V,B,R,S)
+    a=a1(V,B,R,S)
+    b=a2(V,B,R,S)
+    c=a12(V,B,R,S)
+    d=a11(V,B,R,S)
+    e=a22(V,B,R,S)
+    f=coeffscuadraticos33(V,B)
+    g=coeffscuadraticos34(V,B)
+    h=coeffscuadraticos44(V,B)
+    i=lineal3(V,B,R,S)
+    j=lineal4(V,B,R,S)
+    return     integral_aux(a,b,c,d,e,f,g,h,i,j,V,B,R,S)'''
+
+def integral(vector1,vector2):
     V=[[vector1[5,0],vector1[6,0],vector1[7,0],vector1[8,0]],[vector1[6,0],vector1[9,0],vector1[10,0],vector1[11,0]],[vector1[7,0],vector1[10,0],vector1[12,0],vector1[13,0]],[vector1[8,0],vector1[11,0],vector1[13,0],vector1[14,0]]]
     R=[vector1[i,0] for i in range(1,5)]
     B=[[vector2[5,0],vector2[6,0],vector2[7,0],vector2[8,0]],[vector2[6,0],vector2[9,0],vector2[10,0],vector2[11,0]],[vector2[7,0],vector2[10,0],vector2[12,0],vector2[13,0]],[vector2[8,0],vector2[11,0],vector2[13,0],vector2[14,0]]]
     S=[vector2[i,0] for i in range(1,5)]
     #condiciones(V,B,R,S)
     a=a1(V,B,R,S)
-    b=a3(V,B,R,S)
-    c=a13(V,B,R,S)
+    b=a2(V,B,R,S)
+    c=a12(V,B,R,S)
     d=a11(V,B,R,S)
-    e=a33(V,B,R,S)
-    f=coeffscuadraticos22(V,B)
-    g=coeffscuadraticos24(V,B)
+    e=a22(V,B,R,S)
+    f=coeffscuadraticos33(V,B)
+    g=coeffscuadraticos34(V,B)
     h=coeffscuadraticos44(V,B)
-    i=lineal2(V,B,R,S)
+    i=lineal3(V,B,R,S)
     j=lineal4(V,B,R,S)
-    return     update_aux(a,b,c,d,e,f,g,h,i,j,V,B,R,S)
+    return     integral_aux(a,b,c,d,e,f,g,h,i,j,V,B,R,S)
     
+def fidelity(V,B,R,S):
+    condiciones(V,B,R,S)
+    a=a1(V,B,R,S)
+    b=a2(V,B,R,S)
+    c=a12(V,B,R,S)
+    d=a11(V,B,R,S)
+    e=a22(V,B,R,S)
+    f=coeffscuadraticos33(V,B)
+    g=coeffscuadraticos34(V,B)
+    h=coeffscuadraticos44(V,B)
+    i=lineal3(V,B,R,S)
+    j=lineal4(V,B,R,S)
+    return     fidelidad_aux(a,b,c,d,e,f,g,h,i,j,V,B,R,S)
+
+
+def overlap2(vector1,vector2):
+    V=[[vector1[5,0],vector1[6,0],vector1[7,0],vector1[8,0]],[vector1[6,0],vector1[9,0],vector1[10,0],vector1[11,0]],[vector1[7,0],vector1[10,0],vector1[12,0],vector1[13,0]],[vector1[8,0],vector1[11,0],vector1[13,0],vector1[14,0]]]
+    R=[vector1[i,0] for i in range(1,5)]
+    B=[[vector2[5,0],vector2[6,0],vector2[7,0],vector2[8,0]],[vector2[6,0],vector2[9,0],vector2[10,0],vector2[11,0]],[vector2[7,0],vector2[10,0],vector2[12,0],vector2[13,0]],[vector2[8,0],vector2[11,0],vector2[13,0],vector2[14,0]]]
+    S=[vector2[i,0] for i in range(1,5)]
+    #condiciones(V,B,R,S)
+    a=a1(V,B,R,S)
+    b=a2(V,B,R,S)
+    c=a12(V,B,R,S)
+    d=a11(V,B,R,S)
+    e=a22(V,B,R,S)
+    f=coeffscuadraticos33(V,B)
+    g=coeffscuadraticos34(V,B)
+    h=coeffscuadraticos44(V,B)
+    i=lineal3(V,B,R,S)
+    j=lineal4(V,B,R,S)
+    return     np.round(overlap_aux(a,b,c,d,e,f,g,h,i,j,V,B,R,S),9)
+
+
+
+def gaussiano_norm(z):
+    #return np.sqrt(overlap2(z,z))
+    return 1
+
+
+def coherent_overlap(vector1,vector2):
+    R=[vector1[i,0] for i in range(1,5)]
+    S=[vector2[i,0] for i in range(1,5)]
+    a=1/2*(R[0]**2+R[2]**2)+1/2*(R[1]**2+R[3]**2)
+    b=1/2*(S[0]**2+S[2]**2)+1/2*(S[1]**2+S[3]**2)
+    c=1/2*(R[0]+1j*R[2])*(S[0]-1j*S[2])+1/2*(R[1]+1j*R[3])*(S[1]-1j*S[3])
+    return np.exp(-1/2*(a+b)+c)
+
+def coherent_update(vector1,vector2):
+    R=[vector1[i,0] for i in range(1,5)]
+    S=[vector2[i,0] for i in range(1,5)]
+    return (1/np.sqrt(2)*(R[0]+1j*R[2])+1/np.sqrt(2)*(S[0]-1j*S[2]))*coherent_overlap(vector1,vector2)

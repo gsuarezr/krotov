@@ -58,9 +58,9 @@ import numpy as np
 import qutip
 
 #from .second_order import _overlap
-from .Integrals import  fidelity_sq
-_overlap=fidelity_sq
-#_overlap=coherent_overlap
+from .Integrals import  fidelity_sq,coherent_overlap
+#_overlap=fidelity_sq
+_overlap=coherent_overlap
 __all__ = [
     'f_tau',
     'F_ss',

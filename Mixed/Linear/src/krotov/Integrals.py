@@ -1,7 +1,7 @@
 import numpy as np
 
 
-__all__ =['integral','fidelity_sq']
+__all__ =['integral','fidelity_sq','coherent_overlap']
 
 def separate(V,row):
     return V[row][0],V[row][1],V[row][2],V[row][3]
@@ -2174,5 +2174,20 @@ def fidelity_sq(vector1,vector2):
     a=(np.sqrt(gamma)+np.sqrt(Lambda))-np.sqrt(((np.sqrt(gamma)+np.sqrt(Lambda))**2 - delta))
     d=np.array(S)-np.array(R)
     b=np.exp(-(1/2)*np.dot(np.dot(d.T,np.linalg.inv(B+V)),d))
-    return np.sqrt(b/a)
+    return np.sqrt(np.real(b/a))
 
+
+def coherent_overlap(vector1,vector2):
+    R=[vector1[i,0] for i in range(1,5)]
+    S=[vector2[i,0] for i in range(1,5)]
+    a=1/2*(R[0]**2+R[2]**2)+1/2*(R[1]**2+R[3]**2)
+    b=1/2*(S[0]**2+S[2]**2)+1/2*(S[1]**2+S[3]**2)
+    c=1/2*(R[0]+1j*R[2])*(S[0]-1j*S[2])+1/2*(R[1]+1j*R[3])*(S[1]-1j*S[3])
+    return np.exp(-1/2*(a+b)+c)
+
+def coherent_update(vector1,vector2):
+    R=[vector1[i,0] for i in range(1,5)]
+    S=[vector2[i,0] for i in range(1,5)]
+    return (1/np.sqrt(2)*(R[0]+1j*R[2])+1/np.sqrt(2)*(S[0]-1j*S[2]))*coherent_overlap(vector1,vector2)
+
+    

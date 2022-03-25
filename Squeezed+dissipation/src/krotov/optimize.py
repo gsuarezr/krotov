@@ -11,7 +11,8 @@ import inspect
 import logging
 import time
 from functools import partial
-from .Integrals import integral,fidelity_sq,coherent_overlap,coherent_update
+from .Integrals import overlap2, gaussiano_norm, integral, coherent_overlap, coherent_update
+from .update import update_squeezed
 
 import numpy as np
 import threadpoolctl
@@ -462,11 +463,8 @@ def optimize_pulses(
                         time_index,
                     )
                     Ψ = fw_states[i_obj]
-
-                    update = -2*1j*fieldcoupling*(integral(χ,Ψ).imag) 
-                    #update = -fieldcoupling*(coherent_update(Ψ,χ)-coherent_overlap(Ψ,χ)*coherent_update(Ψ,Ψ))
-
-                    # ⟨χ|μ|Ψ⟩ ∈ ℂ
+                    update = fieldcoupling*(update_squeezed(Ψ,χ)-overlap2(Ψ,χ)*update_squeezed(Ψ,Ψ))
+ # ⟨χ|μ|Ψ⟩ ∈ ℂ
                     update *= chi_norms[i_obj]
                     if second_order:
                         update += 0.5 * σ * overlap(delta_phis[i_obj], μ(Ψ))
