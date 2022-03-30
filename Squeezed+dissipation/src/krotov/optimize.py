@@ -463,7 +463,8 @@ def optimize_pulses(
                         time_index,
                     )
                     Ψ = fw_states[i_obj]
-                    update = fieldcoupling*(update_squeezed(Ψ,χ)) # ⟨χ|μ|Ψ⟩ ∈ ℂ
+                    update = fieldcoupling*(update_squeezed(Ψ,χ)-overlap2(Ψ,χ)*update_squeezed(Ψ,Ψ))
+ # ⟨χ|μ|Ψ⟩ ∈ ℂ
                     update *= chi_norms[i_obj]
                     if second_order:
                         update += 0.5 * σ * overlap(delta_phis[i_obj], μ(Ψ))
