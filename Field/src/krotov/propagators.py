@@ -89,14 +89,16 @@ def expm(H, state, dt, c_ops=None, backwards=False, initialize=False):
             eqm_factor = 1
         if backwards:
             #eqm_factor = eqm_factor.conjugate()
-            eqm_factor= -eqm_factor
+            #eqm_factor= -eqm_factor
+            eqm_factor=eqm_factor
         A = (eqm_factor * H[0][1]) * H[0][0]
     else:
         if H[0].type == 'super':
             eqm_factor = 1
         if backwards:
             #eqm_factor = eqm_factor.conjugate()
-            eqm_factor = -eqm_factor
+            eqm_factor = eqm_factor
+            #eqm_factor = -eqm_factor
         A = eqm_factor * H[0]
     for part in H[1:]:
         if isinstance(part, list):
@@ -108,7 +110,10 @@ def expm(H, state, dt, c_ops=None, backwards=False, initialize=False):
     )
     if ok_types:
         with threadpoolctl.threadpool_limits(limits=1):
-            return ((A * dt).expm())(state)
+            if backwards:
+                return (((A * dt).expm()).inv())(state)
+            else:
+                return ((A * dt).expm())(state)
     else:
         raise NotImplementedError(
             "Cannot handle argument types A:%s, state:%s"

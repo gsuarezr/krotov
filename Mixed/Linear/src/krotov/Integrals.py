@@ -1781,7 +1781,7 @@ def i(V,W,R,S):
     aux110=(4.*(v14*((v24*(((0.+2.j)*w11)+((4.*w12)+((0.+-2.j)*w22))))+aux88)))+(w44+(2.*(aux109-(w14**2))));
     output=(-2.*((2.*(s2*(v14**2)))+((4.*(s2*((v14**2)*v22)))+aux84)))/(v44+((-2.*((v14**2)*(1.+((-4.*(w12*((0.+-1.j)+w12)))+aux85))))+aux110));
     return output
- 
+
 def k(V,W,R,S):
     v11,v12,v13,v14=separate(V,0)
     v21,v22,v23,v24=separate(V,1)
@@ -2176,3 +2176,28 @@ def fidelity_sq(vector1,vector2):
     b=np.exp(-(1/2)*np.dot(np.dot(d.T,np.linalg.inv(B+V)),d))
     return np.sqrt(b/a)
 
+def overlap2a(vector1,vector2):
+    V = [[vector1[5, 0], vector1[7, 0], vector1[6, 0], vector1[8, 0]],
+         [vector1[7, 0], vector1[12, 0], vector1[10, 0], vector1[13, 0]],
+         [vector1[6, 0], vector1[10, 0], vector1[9, 0], vector1[13, 0]],
+         [vector1[8, 0], vector1[11, 0], vector1[13, 0], vector1[14, 0]]]
+    R = [vector1[i, 0] for i in range(1, 5)]
+    B = [[vector2[5, 0], vector2[7, 0], vector2[6, 0], vector2[8, 0]],
+         [vector2[7, 0], vector2[12, 0], vector2[10, 0], vector2[13, 0]],
+         [vector2[6, 0], vector2[10, 0], vector2[9, 0], vector2[13, 0]],
+         [vector2[8, 0], vector2[11, 0], vector2[13, 0], vector2[14, 0]]]
+    S = [vector2[i, 0] for i in range(1, 5)]
+    V, R, B, S = np.array(V), np.array(R), np.array(B), np.array(S)
+    delta = np.linalg.det(V + B)
+    b = np.exp(-(1 / 2) * np.dot(np.dot(d.T, np.linalg.inv(B + V)), d))
+    output=4/np.sqrt(delta)*b
+    return output
+
+
+def overlap2(vector1,vector2):
+    R=[vector1[i,0] for i in range(1,5)]
+    S=[vector2[i,0] for i in range(1,5)]
+    a=1/2*(R[0]**2+R[2]**2)+1/2*(R[1]**2+R[3]**2)
+    b=1/2*(S[0]**2+S[2]**2)+1/2*(S[1]**2+S[3]**2)
+    c=1/2*(R[0]+1j*R[2])*(S[0]-1j*S[2])+1/2*(R[1]+1j*R[3])*(S[1]-1j*S[3])
+    return np.exp(-1/2*(a+b)+c)

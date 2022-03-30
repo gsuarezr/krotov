@@ -408,8 +408,8 @@ def optimize_pulses(
             list(range(len(objectives))),
             (
                 chi_states,
-                objectives,
-                #adjoint_objectives,
+                #objectives,
+                adjoint_objectives,
                 guess_pulses,
                 pulses_mapping,
                 tlist,
@@ -462,7 +462,8 @@ def optimize_pulses(
                         time_index,
                     )
                     Ψ = fw_states[i_obj]
-                    update = -fieldcoupling*(coherent_update(Ψ,χ)) # ⟨χ|μ|Ψ⟩ ∈ ℂ
+                    update = coherent_overlap(χ, μ(Ψ))
+                    #update = -fieldcoupling*(coherent_update(Ψ,χ)) # ⟨χ|μ|Ψ⟩ ∈ ℂ
                     update *= chi_norms[i_obj]
                     if second_order:
                         update += 0.5 * σ * overlap(delta_phis[i_obj], μ(Ψ))
@@ -847,8 +848,8 @@ def _forward_propagation(
 def _backward_propagation(
     i_state,
     chi_states,
-    objectives,
-    #adjoint_objectives,
+    #objectives,
+    adjoint_objectives,
     pulses,
     pulses_mapping,
     tlist,
@@ -859,8 +860,8 @@ def _backward_propagation(
     logger = logging.getLogger('krotov')
     logger.info("Started backward propagation of state %d", i_state)
     state = chi_states[i_state]
-    obj = objectives[i_state]
-    #obj = adjoint_objectives[i_state]
+    #obj = objectives[i_state]
+    obj = adjoint_objectives[i_state]
     storage_array = storage(len(tlist))
     storage_array[-1] = state
     mapping = pulses_mapping[i_state]
