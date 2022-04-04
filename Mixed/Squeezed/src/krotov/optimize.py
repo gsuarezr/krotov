@@ -11,7 +11,7 @@ import inspect
 import logging
 import time
 from functools import partial
-from .Integrals import overlap2, gaussiano_norm, integral, coherent_overlap, coherent_update
+from .Integrals import integral,fidelity_sq,overlap2
 
 import numpy as np
 import threadpoolctl
@@ -235,7 +235,7 @@ def optimize_pulses(
     if norm=='gaussiano':
         norm=gaussiano_norm
     if overlap is None:
-        overlap = _overlap
+        overlap = overlap2
     if modify_params_after_iter is not None:
         # From a technical perspective, the `modify_params_after_iter` is
         # really just another info_hook, the only difference is the
@@ -384,7 +384,6 @@ def optimize_pulses(
 
     # Main optimization loop
     for krotov_iteration in range(iter_start + 1, iter_stop + 1):
-
         logger.info("Started Krotov iteration %d", krotov_iteration)
         tic = time.time()
 
@@ -417,7 +416,6 @@ def optimize_pulses(
                 storage,
             ),
         )
-
         # Forward propagation and pulse update
         logger.info("Started forward propagation/pulse update")
         if second_order:
@@ -462,7 +460,9 @@ def optimize_pulses(
                         time_index,
                     )
                     Ψ = fw_states[i_obj]
-                    update = -fieldcoupling*(coherent_update(Ψ,χ)) # ⟨χ|μ|Ψ⟩ ∈ ℂ
+                    #update=overlap(χ,μ(Ψ))
+                    update = -2*1j*fieldcoupling*(integral(χ,Ψ).imag)
+                    # ⟨χ|μ|Ψ⟩ ∈ ℂ
                     update *= chi_norms[i_obj]
                     if second_order:
                         update += 0.5 * σ * overlap(delta_phis[i_obj], μ(Ψ))
