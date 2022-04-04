@@ -55,7 +55,7 @@ from . import (
 from .objectives import Objective, ensemble_objectives, gate_objectives
 from .optimize import optimize_pulses
 from .result import Result
-from .Integrals import integral,fidelity_sq,coherent_overlap
+from .Integrals import integral,fidelity_sq
 
 
 __all__ = [
