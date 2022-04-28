@@ -55,6 +55,7 @@ general, any stateful `propagator` should be an instance of
 .. _Cython: https://cython.org
 """
 from abc import ABC, abstractmethod
+from math import gamma
 
 import numpy as np
 import qutip
@@ -67,6 +68,7 @@ from qutip.superoperator import mat2vec, vec2mat
 
 __all__ = ['expm', 'Propagator', 'DensityMatrixODEPropagator']
 
+gamma=1/1000
 
 def expm(H, state, dt, c_ops=None, backwards=False, initialize=False):
     """Propagate using matrix exponentiation.
@@ -83,21 +85,40 @@ def expm(H, state, dt, c_ops=None, backwards=False, initialize=False):
         raise NotImplementedError("Liouville exponentiation not implemented")
     assert isinstance(H, list) and len(H) > 0
     #eqm_factor = -1j  # factor in front of H on rhs of the equation of motion
-    eqm_factor = -1
+    eqm_factor = 1
     if isinstance(H[0], list):
         if H[0][1].type == 'super':
             eqm_factor = 1
+           
         if backwards:
-            #eqm_factor = eqm_factor.conjugate()
-            eqm_factor= eqm_factor
+            eqm_factor = eqm_factor
+            m=np.zeros((15,15))
+            m[1:15,1:15]=np.eye(14)*gamma
+            m[5,0]=gamma
+            m[9,0]=gamma
+            m[12,0]=gamma
+            m[14,0]=gamma
         A = (eqm_factor * H[0][1]) * H[0][0]
+        if backwards:
+            A-=qutip.Qobj(m)
+        
     else:
         if H[0].type == 'super':
             eqm_factor = 1
         if backwards:
-            #eqm_factor = eqm_factor.conjugate()
-            eqm_factor = eqm_factor
+            eqm_factor = eqm_factor.conjugate()
+            m=np.zeros((15,15))
+            m[1:15,1:15]=np.eye(14)*gamma
+            m[5,0]=gamma
+            m[9,0]=gamma
+            m[12,0]=gamma
+            m[14,0]=gamma
+            
         A = eqm_factor * H[0]
+        if backwards:
+            A-=qutip.Qobj(m)
+        
+
     for part in H[1:]:
         if isinstance(part, list):
             A += (eqm_factor * part[1]) * part[0]
@@ -109,7 +130,7 @@ def expm(H, state, dt, c_ops=None, backwards=False, initialize=False):
     if ok_types:
         with threadpoolctl.threadpool_limits(limits=1):
             if backwards:
-                return (((A * dt).expm()).inv())(state)
+                return (((-A * dt).expm()))(state)
             else:
                 return ((A * dt).expm())(state)
     else:

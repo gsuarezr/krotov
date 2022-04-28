@@ -1,7 +1,7 @@
 import numpy as np
 
 
-__all__ =['integral','fidelity_sq']
+__all__ =['integral','fidelity_sq','overlap2a']
 
 def separate(V,row):
     return V[row][0],V[row][1],V[row][2],V[row][3]
@@ -2152,21 +2152,30 @@ def integral3(V,B,R,S):
     return (np.sqrt(2)/((2*pi)**4))*output*(cons(V,B,R,S))
 
 def integral(vector1,vector2):
-    V=[[vector1[5,0],vector1[7,0],vector1[6,0],vector1[8,0]],[vector1[7,0],vector1[12,0],vector1[10,0],vector1[13,0]],[vector1[6,0],vector1[10,0],vector1[9,0],vector1[13,0]],[vector1[8,0],vector1[11,0],vector1[13,0],vector1[14,0]]]
+    V=[[vector1[5,0],vector1[7,0],vector1[6,0],vector1[8,0]],[vector1[7,0],vector1[12,0],vector1[10,0],vector1[13,0]],[vector1[6,0],vector1[10,0],vector1[9,0],vector1[11,0]],[vector1[8,0],vector1[13,0],vector1[11,0],vector1[14,0]]]
     R=[vector1[i,0] for i in range(1,5)]
-    B=[[vector2[5,0],vector2[7,0],vector2[6,0],vector2[8,0]],[vector2[7,0],vector2[12,0],vector2[10,0],vector2[13,0]],[vector2[6,0],vector2[10,0],vector2[9,0],vector2[13,0]],[vector2[8,0],vector2[11,0],vector2[13,0],vector2[14,0]]]
+    B=[[vector2[5,0],vector2[7,0],vector2[6,0],vector2[8,0]],[vector2[7,0],vector2[12,0],vector2[10,0],vector2[13,0]],[vector2[6,0],vector2[10,0],vector2[9,0],vector2[11,0]],[vector2[8,0],vector2[13,0],vector2[11,0],vector2[14,0]]]
     S=[vector2[i,0] for i in range(1,5)]
-    S[1],S[2]=S[2],S[1]
-    R[1],R[2]=R[2],R[1]
+    S[1], S[2] = S[2], S[1]
+    R[1], R[2] = R[2], R[1]
+    #V=[[V[0][0]-R[0]*R[0],V[0][1]-R[0]*R[1],V[0][2]-R[0]*R[2],V[0][3]-R[0]*R[3]],[V[1][0]-R[0]*R[1],V[1][1]-R[1]*R[1],V[1][2]-R[1]*R[2],V[1][3]-R[1]*R[3]],[V[2][0]-R[2]*R[0],V[2][1]-R[2]*R[1],V[2][2]-R[2]**2,V[2][3]-R[2]*R[3]],[V[3][0]-R[3]*R[0],V[3][1]-R[3]*R[1],V[3][2]-R[3]*R[2],V[3][3]-R[3]**2]]
+    #B=[[B[0][0]-S[0]*S[0],B[0][1]-S[0]*S[1],B[0][2]-S[0]*S[2],B[0][3]-S[0]*S[3]],[B[1][0]-S[0]*S[1],B[1][1]-S[1]*S[1],B[1][2]-S[1]*S[2],B[1][3]-S[1]*S[3]],[B[2][0]-S[2]*S[0],B[2][1]-S[2]*S[1],B[2][2]-S[2]**2,B[2][3]-S[2]*S[3]],[B[3][0]-S[3]*S[0],B[3][1]-S[3]*S[1],B[3][2]-S[3]*S[2],B[3][3]-S[3]**2]]
+    V=V-np.outer(R,R)
+    B=B-np.outer(S,S)
+    
     return integral3(V,B,R,S)
 
 
 def fidelity_sq(vector1,vector2):
-    V=[[vector1[5,0],vector1[7,0],vector1[6,0],vector1[8,0]],[vector1[7,0],vector1[12,0],vector1[10,0],vector1[13,0]],[vector1[6,0],vector1[10,0],vector1[9,0],vector1[13,0]],[vector1[8,0],vector1[11,0],vector1[13,0],vector1[14,0]]]
+    V=[[vector1[5,0],vector1[7,0],vector1[6,0],vector1[8,0]],[vector1[7,0],vector1[12,0],vector1[10,0],vector1[13,0]],[vector1[6,0],vector1[10,0],vector1[9,0],vector1[11,0]],[vector1[8,0],vector1[13,0],vector1[11,0],vector1[14,0]]]
     R=[vector1[i,0] for i in range(1,5)]
-    B=[[vector2[5,0],vector2[7,0],vector2[6,0],vector2[8,0]],[vector2[7,0],vector2[12,0],vector2[10,0],vector2[13,0]],[vector2[6,0],vector2[10,0],vector2[9,0],vector2[13,0]],[vector2[8,0],vector2[11,0],vector2[13,0],vector2[14,0]]]
+    B=[[vector2[5,0],vector2[7,0],vector2[6,0],vector2[8,0]],[vector2[7,0],vector2[12,0],vector2[10,0],vector2[13,0]],[vector2[6,0],vector2[10,0],vector2[9,0],vector2[11,0]],[vector2[8,0],vector2[13,0],vector2[11,0],vector2[14,0]]]
     S=[vector2[i,0] for i in range(1,5)]
-    V,R,B,S=np.array(V),np.array(R),np.array(B),np.array(S)
+    S[1], S[2] = S[2], S[1]
+    R[1], R[2] = R[2], R[1]
+    V2 = V - np.outer(R, R)
+    B2 = B - np.outer(S, S)
+    V,R,B,S=np.array(V2),np.array(R),np.array(B2),np.array(S)
     delta=np.linalg.det(V+B)
     J=np.array([[0,1,0,0],[-1,0,0,0],[0,0,0,1],[0,0,-1,0]])
     gamma=(2**4)*np.linalg.det(np.dot(np.dot(J,B),np.dot(J,V))- np.eye(4)/4 )
@@ -2177,17 +2186,36 @@ def fidelity_sq(vector1,vector2):
     return np.sqrt(b/a)
 
 def overlap2a(vector1,vector2):
-    V = [[vector1[5, 0], vector1[7, 0], vector1[6, 0], vector1[8, 0]],
-         [vector1[7, 0], vector1[12, 0], vector1[10, 0], vector1[13, 0]],
-         [vector1[6, 0], vector1[10, 0], vector1[9, 0], vector1[13, 0]],
-         [vector1[8, 0], vector1[11, 0], vector1[13, 0], vector1[14, 0]]]
-    R = [vector1[i, 0] for i in range(1, 5)]
-    B = [[vector2[5, 0], vector2[7, 0], vector2[6, 0], vector2[8, 0]],
-         [vector2[7, 0], vector2[12, 0], vector2[10, 0], vector2[13, 0]],
-         [vector2[6, 0], vector2[10, 0], vector2[9, 0], vector2[13, 0]],
-         [vector2[8, 0], vector2[11, 0], vector2[13, 0], vector2[14, 0]]]
-    S = [vector2[i, 0] for i in range(1, 5)]
+    #V = [[vector1[5, 0], vector1[7, 0], vector1[6, 0], vector1[8, 0]],
+       #  [vector1[7, 0], vector1[12, 0], vector1[10, 0], vector1[13, 0]],
+      #   [vector1[6, 0], vector1[10, 0], vector1[9, 0], vector1[13, 0]],
+     #    [vector1[8, 0], vector1[11, 0], vector1[13, 0], vector1[14, 0]]]
+    #R = [vector1[i, 0] for i in range(1, 5)]
+    #B = [[vector2[5, 0], vector2[7, 0], vector2[6, 0], vector2[8, 0]],
+     #    [vector2[7, 0], vector2[12, 0], vector2[10, 0], vector2[13, 0]],
+      #   [vector2[6, 0], vector2[10, 0], vector2[9, 0], vector2[13, 0]],
+       #  [vector2[8, 0], vector2[11, 0], vector2[13, 0], vector2[14, 0]]]
+    #S = [vector2[i, 0] for i in range(1, 5)]
+    
+    #S[1],S[2]=S[2],S[1]
+    #R[1],R[2]=R[2],R[1]
+    #V=[[V[0][0]-R[0]**2,V[0][1]-R[0]*R[1],V[0][2]-R[0]*R[2],V[0][3]-R[0]*R[3]],[V[1][0]-R[0]*R[1],V[1][1]-R[1]*R[1],V[1][2]-R[1]*R[2],V[1][3]-R[1]*R[3]],[V[2][0]-R[2]*R[0],V[2][1]-R[2]*R[1],V[2][2]-R[2]**2,V[2][3]-R[2]*R[3]],[V[3][0]-R[3]*R[0],V[3][1]-R[3]*R[1],V[3][2]-R[3]*R[2],V[3][3]-R[3]**2]]
+    #B=[[B[0][0]-S[0]**2,B[0][1]-S[0]*S[1],B[0][2]-S[0]*S[2],B[0][3]-S[0]*S[3]],[B[1][0]-S[0]*S[1],B[1][1]-S[1]*S[1],B[1][2]-S[1]*S[2],B[1][3]-S[1]*S[3]],[B[2][0]-S[2]*S[0],B[2][1]-S[2]*S[1],B[2][2]-S[2]**2,B[2][3]-S[2]*S[3]],[B[3][0]-S[3]*S[0],B[3][1]-S[3]*S[1],B[3][2]-S[3]*S[2],B[3][3]-S[3]**2]]
+    
+    V=[[vector1[5,0],vector1[7,0],vector1[6,0],vector1[8,0]],[vector1[7,0],vector1[12,0],vector1[10,0],vector1[13,0]],[vector1[6,0],vector1[10,0],vector1[9,0],vector1[11,0]],[vector1[8,0],vector1[13,0],vector1[11,0],vector1[14,0]]]
+    R=[vector1[i,0] for i in range(1,5)]
+    B=[[vector2[5,0],vector2[7,0],vector2[6,0],vector2[8,0]],[vector2[7,0],vector2[12,0],vector2[10,0],vector2[13,0]],[vector2[6,0],vector2[10,0],vector2[9,0],vector2[11,0]],[vector2[8,0],vector2[13,0],vector2[11,0],vector2[14,0]]]
+    S=[vector2[i,0] for i in range(1,5)]
+    S[1], S[2] = S[2], S[1]
+    R[1], R[2] = R[2], R[1]
+    #V=[[V[0][0]-R[0]*R[0],V[0][1]-R[0]*R[1],V[0][2]-R[0]*R[2],V[0][3]-R[0]*R[3]],[V[1][0]-R[0]*R[1],V[1][1]-R[1]*R[1],V[1][2]-R[1]*R[2],V[1][3]-R[1]*R[3]],[V[2][0]-R[2]*R[0],V[2][1]-R[2]*R[1],V[2][2]-R[2]**2,V[2][3]-R[2]*R[3]],[V[3][0]-R[3]*R[0],V[3][1]-R[3]*R[1],V[3][2]-R[3]*R[2],V[3][3]-R[3]**2]]
+    #B=[[B[0][0]-S[0]*S[0],B[0][1]-S[0]*S[1],B[0][2]-S[0]*S[2],B[0][3]-S[0]*S[3]],[B[1][0]-S[0]*S[1],B[1][1]-S[1]*S[1],B[1][2]-S[1]*S[2],B[1][3]-S[1]*S[3]],[B[2][0]-S[2]*S[0],B[2][1]-S[2]*S[1],B[2][2]-S[2]**2,B[2][3]-S[2]*S[3]],[B[3][0]-S[3]*S[0],B[3][1]-S[3]*S[1],B[3][2]-S[3]*S[2],B[3][3]-S[3]**2]]
+    V=V-np.outer(R,R)
+    B=B-np.outer(S,S)
+    
+   
     V, R, B, S = np.array(V), np.array(R), np.array(B), np.array(S)
+    d=R-S
     delta = np.linalg.det(V + B)
     b = np.exp(-(1 / 2) * np.dot(np.dot(d.T, np.linalg.inv(B + V)), d))
     output=4/np.sqrt(delta)*b
