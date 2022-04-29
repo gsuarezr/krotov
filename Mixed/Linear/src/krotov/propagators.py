@@ -68,9 +68,9 @@ from qutip.superoperator import mat2vec, vec2mat
 
 __all__ = ['expm', 'Propagator', 'DensityMatrixODEPropagator']
 
-gamma=1/1000
 
-def expm(H, state, dt, c_ops=None, backwards=False, initialize=False):
+
+def expm(H, state, gamma,dt, c_ops=None, backwards=False,  initialize=False):
     """Propagate using matrix exponentiation.
     This supports `H` being a Hamiltonian (for a Hilbert space `state`) or a
     Liouvillian (for `state` being a density matrix) in nested-list format.
@@ -89,7 +89,7 @@ def expm(H, state, dt, c_ops=None, backwards=False, initialize=False):
     if isinstance(H[0], list):
         if H[0][1].type == 'super':
             eqm_factor = 1
-           
+
         if backwards:
             eqm_factor = eqm_factor
             m=np.zeros((15,15))
@@ -101,7 +101,7 @@ def expm(H, state, dt, c_ops=None, backwards=False, initialize=False):
         A = (eqm_factor * H[0][1]) * H[0][0]
         if backwards:
             A-=qutip.Qobj(m)
-        
+
     else:
         if H[0].type == 'super':
             eqm_factor = 1
@@ -113,11 +113,11 @@ def expm(H, state, dt, c_ops=None, backwards=False, initialize=False):
             m[9,0]=gamma
             m[12,0]=gamma
             m[14,0]=gamma
-            
+
         A = eqm_factor * H[0]
         if backwards:
             A-=qutip.Qobj(m)
-        
+
 
     for part in H[1:]:
         if isinstance(part, list):
