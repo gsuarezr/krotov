@@ -43,6 +43,7 @@ def optimize_pulses(
     objectives,
     pulse_options,
     tlist,
+    gamma,
     fieldcoupling,
     *,
     propagator,
@@ -297,6 +298,7 @@ def optimize_pulses(
             list(range(len(objectives))),
             (
                 objectives,
+                gamma,
                 guess_pulses,
                 pulses_mapping,
                 tlist,
@@ -408,6 +410,7 @@ def optimize_pulses(
             (
                 chi_states,
                 objectives,
+                gamma,
                 #adjoint_objectives,
                 guess_pulses,
                 pulses_mapping,
@@ -481,6 +484,7 @@ def optimize_pulses(
                 (
                     fw_states,
                     objectives,
+                    gamma,
                     optimized_pulses,
                     pulses_mapping,
                     tlist,
@@ -804,6 +808,7 @@ def _skip_initial_forward_propagation(objectives, result, sigma, logger):
 def _forward_propagation(
     i_objective,
     objectives,
+    gamma,
     pulses,
     pulses_mapping,
     tlist,
@@ -831,7 +836,7 @@ def _forward_propagation(
         ]
         dt = tlist[time_index + 1] - tlist[time_index]
         state = propagators[i_objective](
-            H, state, dt, c_ops, initialize=(time_index == 0)
+            H, state, gamma,dt, c_ops, initialize=(time_index == 0)
         )
         if store_all:
             storage_array[time_index + 1] = state
@@ -848,6 +853,7 @@ def _backward_propagation(
     i_state,
     chi_states,
     objectives,
+    gamma,
     #adjoint_objectives,
     pulses,
     pulses_mapping,
@@ -876,6 +882,7 @@ def _backward_propagation(
         state = propagators[i_state](
             H,
             state,
+            gamma,
             dt,
             c_ops,
             backwards=True,
@@ -890,6 +897,7 @@ def _forward_propagation_step(
     i_state,
     states,
     objectives,
+    gamma,
     pulses,
     pulses_mapping,
     tlist,
@@ -907,5 +915,5 @@ def _forward_propagation_step(
     ]
     dt = tlist[time_index + 1] - tlist[time_index]
     return propagators[i_state](
-        H, state, dt, c_ops, initialize=(time_index == 0)
+        H, state, gamma,dt, c_ops, initialize=(time_index == 0)
     )
