@@ -79,6 +79,7 @@ def expm(H, state, gamma,dt, c_ops=None, backwards=False,  initialize=False):
     evaluated in single-threaded mode, to prevent accidental nested
     parallelization.
     """
+    gamma,w,n=gamma
     if c_ops is None:
         c_ops = []
     if len(c_ops) > 0:
@@ -94,10 +95,12 @@ def expm(H, state, gamma,dt, c_ops=None, backwards=False,  initialize=False):
             eqm_factor = eqm_factor
             m=np.zeros((15,15))
             m[1:15,1:15]=np.eye(14)*gamma
-            m[5,0]=gamma
-            m[9,0]=gamma
-            m[12,0]=gamma
-            m[14,0]=gamma
+            #m[5,0]=gamma
+            #m[9,0]=gamma
+            #m[12,0]=gamma
+            #m[14,0]=gamma
+            m[5,0]=gamma*2/w*(n+1/2)
+            m[12,0]=gamma*2*w*(n+1/2)
         A = (eqm_factor * H[0][1]) * H[0][0]
         if backwards:
             A-=qutip.Qobj(m)
@@ -109,11 +112,12 @@ def expm(H, state, gamma,dt, c_ops=None, backwards=False,  initialize=False):
             eqm_factor = eqm_factor.conjugate()
             m=np.zeros((15,15))
             m[1:15,1:15]=np.eye(14)*gamma
-            m[5,0]=gamma
-            m[9,0]=gamma
-            m[12,0]=gamma
-            m[14,0]=gamma
-
+            #m[5,0]=gamma
+            #m[9,0]=gamma
+            #m[12,0]=gamma
+            #m[14,0]=gamma
+            m[5,0]=gamma*2/w*(n+1/2)
+            m[12,0]=gamma*2*w*(n+1/2)
         A = eqm_factor * H[0]
         if backwards:
             A-=qutip.Qobj(m)
