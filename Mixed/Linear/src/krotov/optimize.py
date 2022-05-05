@@ -464,7 +464,7 @@ def optimize_pulses(
                     )
                     Ψ = fw_states[i_obj]
                     #update=overlap2(χ,μ(Ψ))
-                    update = -2*1j*fieldcoupling*(integral(χ,Ψ).imag)
+                    update = -2*1j*np.sqrt(gamma[1])*fieldcoupling*(integral(χ,Ψ).imag)
                     # ⟨χ|μ|Ψ⟩ ∈ ℂ
                     update *= chi_norms[i_obj]
                     if second_order:
