@@ -208,3 +208,13 @@ def giovanetti(w0,g,gamma,F,N,T=31):
     Energy2=w0*sol[:,3]
     Ergotropy2=w0*(sol[:,3]-1/2*(np.sqrt(D)-1))
     return t,Energy2,Ergotropy2
+
+def field_energy(opt_result,tlist,T,nt):
+    EField=np.transpose(np.array(opt_result.optimized_controls))
+    EEnergy=np.zeros(len(tlist))
+    EEnergy[0]=(np.square(EField[0]))*(T/nt)
+    a=0
+    for i in range (1,nt):
+        a+=np.square(EField[i-1])
+        EEnergy[i]=(np.square(EField[i])+a)*(T/nt)
+    return EEnergy[nt-1]
