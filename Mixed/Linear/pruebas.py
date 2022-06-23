@@ -137,7 +137,7 @@ def get_result(omega,ampl0,mu,g,gamma,Nb,tlist,nt,stop=10000,rate=1,energy=2):
       chi_constructor=krotov.functionals.chis_ss,
       info_hook=krotov.info_hooks.print_table(J_T=krotov.functionals.J_T_ss),
       check_convergence=krotov.convergence.Or(
-          krotov.convergence.value_below('9e-3', name='J_T'),
+          krotov.convergence.value_below('9e-5', name='J_T'),
           krotov.convergence.check_monotonic_error,
           #krotov.convergence.check_monotonic_fidelity,
 
