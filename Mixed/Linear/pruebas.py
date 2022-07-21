@@ -119,14 +119,23 @@ def get_result(omega,ampl0,mu,g,gamma,Nb,tlist,nt,stop=10000,rate=1,energy=2):
         return krotov.shapes.flattop(
         t, t_start=0, t_stop=T, t_rise=0.05 * T, t_fall=0.05 * T, func='sinsq'
          )
+    r=1.5,
+    r2=np.pi/8,
+    theta=np.pi/4  
     pulse_options = { H[1][1]: dict(lambda_a=rate, update_shape=S)}
-    x=energy
-    target=qutip.Qobj(np.array([1,0, np.sqrt(x)/np.sqrt(omega),0,np.sqrt(x)*np.sqrt(omega),1/2,0,0,0,1/2+x/omega,0,x,1/2,0,1/2+x*omega]))
-    objectives = [krotov.Objective(
-    initial_state=qutip.Qobj(np.array([1,0,0,0,0,1/2,0,0,0,1/2,0,0,1/2,0,1/2])), target=target, H=H
-          )
-      ]
-
+    r2=0.5
+    theta=np.pi/4
+    x=0.05
+    target=qutip.Qobj(np.array([1,0,np.sqrt(x),0,np.sqrt(x),1/2*np.cosh(2*r2),0,-1/2*np.sinh(2*r2)*np.cos(theta),-1/2*np.sinh(2*r2)*np.sin(theta),1/2*np.cosh(2*r2)+x,-1/2*np.sinh(2*r2)*np.sin(theta),1/2*np.sinh(2*r2)*np.cos(theta)+x,1/2*np.cosh(2*r2),0,1/2*np.cosh(2*r2)+x]) )
+    r2=1.5
+    theta=np.pi/4
+    initial_state=np.array([1,0,0,0,0,1/2*np.cosh(2*r2),0,-1/2*np.sinh(2*r2)*np.cos(theta),-1/2*np.sinh(2*r2)*np.sin(theta),1/2*np.cosh(2*r2),-1/2*np.sinh(2*r2)*np.sin(theta),1/2*np.sinh(2*r2)*np.cos(theta),1/2*np.cosh(2*r2),0,1/2*np.cosh(2*r2)]) 
+    #initial_state=np.array([1,0,0,0,0,1/2,0,0,0,1/2,0,0,1/2,0,1/2])
+    objectives = [
+    krotov.Objective(
+        initial_state=qutip.Qobj(initial_state), target=qutip.Qobj(target), H=H
+        #initial_state=qutip.Qobj(np.array([1,0,0,0,0,1/2,0,0,0,1/2,0,0,1/2,0,1/2])), target=qutip.Qobj(target), H=H
+      )]
     opt_result = krotov.optimize_pulses(
       objectives,
       pulse_options=pulse_options,
@@ -152,12 +161,25 @@ def get_result(omega,ampl0,mu,g,gamma,Nb,tlist,nt,stop=10000,rate=1,energy=2):
     ratio=Ratio(opt_result.states,omega,nt)
     Energy=np.zeros(nt)
     Ergotropy=np.zeros(nt)
+    c01=[]
+    c02=[]
+    c03=[]
+    a=[]
+    b=[]
+    c=[]
+    d=[]
     for i in range (0,nt):
         vec,covar=conversion(opt_result.states[0][i])
+        a.append(vec[0])
+        b.append(vec[1])
+        c.append(vec[2])
+        d.append(vec[3])
+        c01.append(covar[0,1])
+        c02.append(covar[0,2])
         Energy[i]=1/2*(omega**2*np.real(covar[2,2])+np.real(covar[3,3])+omega**2*(np.real(vec[2]))**2+(np.real(vec[3]))**2)-omega/2
         D=np.real((1+2/omega*np.real(Energy[i])-omega*np.abs(np.real(vec[2])+1j*np.real(vec[3]))**2)**2-4*np.abs(omega*1/2*(np.real(covar[2,2])+np.real(vec[2])**2-1/(omega**2)*(np.real(covar[3,3])+np.real(vec[3])**2))+1j*(np.real(covar[2,3])+np.real(vec[2])*np.real(vec[3]))-omega/2*(np.real(vec[2])+1j/omega*np.real(vec[3]))**2)**2)
         Ergotropy[i]=np.real(Energy[i]-(np.sqrt(D)-1)/2)    
-    return ratio,power,opt_result,Energy,Ergotropy
+    return ratio,power,opt_result,Energy,Ergotropy,c01,c02,a,b,c,d
 
 def odeintz(func, z0, t, **kwargs):
     """An odeint-like function for complex valued differential equations."""
@@ -218,3 +240,4 @@ def field_energy(opt_result,tlist,T,nt):
         a+=np.square(EField[i-1])
         EEnergy[i]=(np.square(EField[i])+a)*(T/nt)
     return EEnergy[nt-1]
+
