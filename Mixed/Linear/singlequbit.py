@@ -153,7 +153,14 @@ def get_by_iter(opt_result, iter):
             )
             return dynamics.states[-1]
 
-
+def trace_A(rho):
+    """Partial trace over the A degrees of freedom"""
+    rho_q = np.zeros(shape=(2, 2), dtype=np.complex_)
+    rho_q[0, 0] = rho[0, 0] + rho[2, 2]
+    rho_q[0, 1] = rho[0, 1] + rho[2, 3]
+    rho_q[1, 0] = rho[1, 0] + rho[3, 2]
+    rho_q[1, 1] = rho[1, 1] + rho[3, 3]
+    return qutip.Qobj(rho_q)
 if __name__ == "__main__":
     omega = 1  # qubit level splitting
     g = 0.2*omega  # qubit-TLS coupling
