@@ -113,7 +113,7 @@ def singlequbit_opt(omega, g, gamma, N, rho_th, rho_trg, nt, lam, T):
         objectives,
         pulse_options,
         tlist,
-        iter_stop=1000,
+        iter_stop=100000,
         propagator=krotov.propagators.DensityMatrixODEPropagator(atol=1e-10, rtol=1e-8),
         chi_constructor=chis_qubit,
         info_hook=krotov.info_hooks.chain(
@@ -161,7 +161,7 @@ if __name__ == "__main__":
     N=0 # inverse bath temperature
     T = 15 # final time
     nt = 1000 # number of time steps
-    lambdas=np.linspace(0.005,10,3)#Number of lambdas to probe
+    lambdas=np.linspace(0.005,10,100)#Number of lambdas to probe
     def paramentric_curve(lam):
         result=singlequbit_opt(omega, g, gamma, N, rho_th, rho_trg, nt, lam, T)
         result.dump(f'results_single/lambda={lam}_krotov_results')
